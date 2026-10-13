@@ -10,7 +10,7 @@ que la vigente, la descarga y reemplaza la fila "reciente". Requiere Pillow y ac
 import base64, datetime, io, json, sys, urllib.request
 from PIL import Image
 
-BBOX = "-27.475,-59.035,-27.390,-58.925"  # minLat,minLon,maxLat,maxLon (WMS 1.3.0, EPSG:4326)
+BBOX = "-27.4915,-59.015,-27.3885,-58.865"  # centrado en el dique regulador del Río Negro  # minLat,minLon,maxLat,maxLon (WMS 1.3.0, EPSG:4326)
 LAYERS = ["HLS_S30_Nadir_BRDF_Adjusted_Reflectance", "HLS_L30_Nadir_BRDF_Adjusted_Reflectance"]
 
 

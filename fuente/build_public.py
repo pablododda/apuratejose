@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Arma la versión pública (sin login) del tablero "Crecida del Paraná · Resistencia".
+"""Arma la versión pública (sin login) del tablero "Crecida del Paraná y cómo afecta al Río Negro".
 
 Uso: python3 -I build_public.py PAGE_HTML DATA_DIR OUT_HTML SHARE_URL
   PAGE_HTML: el texto de files/index.html del Dashboard
@@ -18,7 +18,7 @@ data = {i: json.load(open(os.path.join(data_dir, i + ".json"), encoding="utf-8")
 page = re.sub(r"const URL_TABLERO = '[^']*';", "const URL_TABLERO = " + json.dumps(share_url) + ";", page)
 
 TOKENS = """
-<title>Crecida del Paraná · Resistencia</title>
+<title>Crecida del Paraná y cómo afecta al Río Negro</title>
 <style>
 :root {
   --font-anthropic-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;

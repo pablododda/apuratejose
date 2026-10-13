@@ -32,6 +32,14 @@
 .rp-tip .d { color: var(--cds-text-secondary); }
 .rp-tip .v { font-variant-numeric: tabular-nums; font-weight: 600; }
 .rp-slider { margin-top: var(--cds-gap-sm); }
+/* barra del día: botón de 20 px, alineado con el punto del gráfico */
+.rp-sl-b input { width: 100%; }
+.rp-sl-a input, .rp-sl-b input { -webkit-appearance: none; appearance: none; display: block; height: 28px; background: transparent; margin: 0; }
+.rp-sl-a input::-webkit-slider-runnable-track, .rp-sl-b input::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: var(--color-border-line); }
+.rp-sl-a input::-moz-range-track, .rp-sl-b input::-moz-range-track { height: 4px; border-radius: 2px; background: var(--color-border-line); }
+.rp-sl-a input::-webkit-slider-thumb, .rp-sl-b input::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -8px; border-radius: 50%; background: var(--rp-c1); border: 3px solid var(--color-panel); box-shadow: 0 0 0 1px var(--rp-c1); cursor: grab; }
+.rp-sl-a input::-moz-range-thumb, .rp-sl-b input::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--rp-c1); border: 3px solid var(--color-panel); box-shadow: 0 0 0 1px var(--rp-c1); cursor: grab; }
+.rp-slider label b { color: var(--color-fg); font-variant-numeric: tabular-nums; }
 .rp-slider label { display: block; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-bottom: 4px; }
 .rp-slider input { width: 100%; accent-color: var(--color-fg); height: 28px; }
 .rp-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: var(--cds-gap-sm); }
@@ -62,6 +70,7 @@
 .rp-satline { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.25); pointer-events: none; }
 .rp-satlab { position: absolute; top: 8px; font-size: 11px; line-height: 1.3; color: #fff; background: rgba(0,0,0,.55); padding: 3px 7px; border-radius: 6px; max-width: 46%; }
 .rp-satlab.l { left: 8px; } .rp-satlab.r { right: 8px; text-align: right; }
+.rp-satpintxt { position: absolute; transform: translate(-50%, -26px); padding: 1px 6px; border-radius: 4px; background: rgba(0,0,0,.6); color: #fff; font-size: 11px; font-weight: 600; pointer-events: none; white-space: nowrap; }
 .rp-satpin { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #e0362c; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.3); pointer-events: none; }
 #tu-zona .rp-sub3 { margin: var(--cds-gap-lg) 0 0; padding-top: var(--cds-gap-md); border-top: 1px solid var(--color-border-line); font-size: var(--cds-font-size-heading); }
 .rp-histtxt { font-size: var(--cds-font-size-body); margin: var(--cds-gap-xs) 0 0; max-width: 40rem; color: var(--color-fg); }
@@ -71,27 +80,153 @@
 .rp-scene { margin: 0; }
 .rp-scene figcaption { font-size: var(--cds-font-size-body); }
 .rp-scenebox { min-height: 190px; margin-top: var(--cds-gap-xs); }
+@media (min-width: 860px) { .rp-scene figcaption { min-height: 2.9em; } .rp-scenebox, .rp-histbox { height: 196px; min-height: 0; } }
 .rp-histrow { margin-top: var(--cds-gap-lg); padding-top: var(--cds-gap-md); border-top: 1px solid var(--color-border-line); }
 #xs-sim { margin-top: var(--cds-gap-lg); }
-#simulacion .rp-simout { margin-top: var(--cds-gap-md); }
+#grafico .rp-simout { margin-top: var(--cds-gap-md); }
+.rp-chartwrap { position: relative; }
+.rp-lead { margin: 0; font-size: 19px; font-weight: 600; letter-spacing: -.01em; color: var(--color-fg); }
+.rp-chartbox:focus { outline: none; }
+.rp-chartbox:focus-visible { outline: 2px solid var(--rp-c1); outline-offset: 4px; border-radius: 8px; }
+/* tarjetita de lluvia dentro del Río Negro (aparece con las compuertas cerradas) */
+.rp-rainmini { position: absolute; z-index: 1; pointer-events: none; box-sizing: border-box; padding: 7px 9px 6px; border-radius: 8px;
+  background: color-mix(in srgb, var(--color-panel) 94%, transparent); border: 1px solid var(--color-border-line); box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.06);
+  font-size: 11px; line-height: 1.35; color: var(--color-fg); font-variant-numeric: tabular-nums;
+  opacity: 0; transform: translateY(4px); transition: opacity .3s ease, transform .3s ease; }
+.rp-rainmini.on { opacity: 1; transform: none; transition: opacity .4s ease, transform .4s ease; }
+.rp-rainmini .h { font-weight: 600; color: var(--color-fg); transition: color .3s; margin-bottom: 4px; letter-spacing: -.005em; }
+.rp-rainmini.risk .h { color: var(--color-warn); }
+.rp-rainmini .r { display: grid; grid-template-columns: auto 1fr auto; column-gap: 8px; align-items: baseline; }
+.rp-rainmini .d { color: var(--color-fg-muted); text-transform: capitalize; }
+.rp-rainmini .w { color: var(--color-fg-muted); }
+.rp-rainmini .mm { text-align: right; font-weight: 500; }
+.rp-rainmini .r.s .w, .rp-rainmini .r.s .mm { color: var(--color-fg); font-weight: 600; }
+.rp-rainmini .r.s .w::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--color-warn); margin-right: 5px; vertical-align: 1px; }
+.rp-rainin { margin-top: 8px; padding-top: 7px; border-top: 1px solid color-mix(in srgb, currentColor 15%, transparent); font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.rp-rainin .h { font-weight: 600; margin-bottom: 3px; }
+.rp-rainin .r { display: grid; grid-template-columns: 4.2em 1fr auto; column-gap: 8px; }
+.rp-rainin .d { color: var(--color-fg-muted); text-transform: capitalize; }
+.rp-rainin .w { color: var(--color-fg-muted); }
+.rp-rainin .mm { text-align: right; }
+.rp-rainin .r.s .w, .rp-rainin .r.s .mm { color: var(--color-fg); font-weight: 600; }
+.rp-rainin .r.s .w::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--color-warn); margin-right: 5px; vertical-align: 1px; }
+.rp-rainmini.narrow .r { grid-template-columns: 1fr auto; }
+.rp-rainmini.narrow .w { display: none; }
+.rp-rainmini.narrow .r.s .d::after { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--color-warn); margin-left: 4px; vertical-align: 1px; }
+/* la tarjeta toma el color del nivel: naranja claro en alerta, rojo claro en evacuación */
+#grafico .rp-simout { transition: background-color .3s, border-color .3s; }
+#grafico .rp-simout.lv-alerta { background: color-mix(in srgb, var(--color-warn) 20%, var(--color-panel)); border-color: color-mix(in srgb, var(--color-warn) 50%, var(--color-panel)); border-left-color: var(--color-warn); }
+#grafico .rp-simout.lv-evac { background: color-mix(in srgb, var(--color-bad) 18%, var(--color-panel)); border-color: color-mix(in srgb, var(--color-bad) 50%, var(--color-panel)); border-left-color: var(--color-bad); }
+/* gráfico de fechas + dique: al lado en compu, uno abajo del otro en el celu. Una sola barra cruza los dos */
+.rp-split { display: flex; flex-direction: column; margin-top: var(--cds-gap-sm); }
+.rp-split-a, .rp-split-b, .rp-brest { display: contents; }
+@media (min-width: 860px) {
+  .rp-split { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); column-gap: var(--cds-gap-lg); row-gap: 0; align-items: start; margin-top: 0;
+    grid-template-areas: "ta tb" "chart dam" "one one" "out rest" "pr rest"; grid-template-rows: auto auto auto auto 1fr; }
+  .rp-brest { display: block; grid-area: rest; }
+  .rp-split .rp-ta { grid-area: ta; } .rp-split .rp-tb { grid-area: tb; } .rp-split .rp-chartwrap { grid-area: chart; }
+  .rp-split .rp-damwrap { grid-area: dam; } .rp-split .rp-one { grid-area: one; } .rp-split #sim-out { grid-area: out; } .rp-split .rp-pof { grid-area: pr; }
+  .rp-split .rp-tb, .rp-split .rp-damwrap, .rp-split .rp-brest { border-left: 1px solid var(--color-border-line); padding-left: var(--cds-gap-lg); align-self: stretch; }
+  .rp-split .rp-tb { margin-bottom: 6px; padding-bottom: 0; }
+}
+@media (max-width: 859px) {
+  .rp-split .rp-ta { order: 0; }
+  .rp-split .rp-chartwrap { order: 1; }
+  .rp-split .rp-one { order: 2; }
+  .rp-split .rp-tb { order: 3; margin-top: 10px; }
+  .rp-split .rp-one { margin: 2px 0 0; }
+  .rp-split .rp-onecap { height: 20px; }
+  .rp-split .rp-damwrap { position: relative; }
+  .rp-split .rp-damhead { position: absolute; right: 0; top: -33px; height: 26px; } /* la etiqueta Simulación va al lado del título */
+  .rp-split .rp-damwrap { order: 4; }
+  .rp-split #sim-out { order: 5; }
+  .rp-split #lluvia { order: 6; margin-top: var(--cds-gap-md); }
+  .rp-split .rp-damnote { order: 7; }
+  .rp-split .rp-pof { order: 8; }
+}
+/* la barra única: la parte de los días queda debajo del gráfico; la parte de la simulación, en color de aviso */
+.rp-one { margin: var(--cds-gap-sm) 0 var(--cds-gap-md); --b: 65%; }
+.rp-video { width: min(960px, calc(100vw - 32px)); padding: 0; border: 0; border-radius: 12px; background: var(--color-panel); color: var(--color-fg); box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+.rp-video::backdrop { background: rgba(0,0,0,.6); }
+.rp-videohead { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px 10px 16px; font-size: var(--cds-font-size-caption); font-weight: 600; }
+.rp-videohead button { border: 0; background: transparent; color: var(--color-fg-muted); font-size: 18px; line-height: 1; cursor: pointer; padding: 6px 8px; border-radius: 6px; }
+.rp-videohead button:hover { background: var(--color-border-line); }
+.rp-videobox { position: relative; aspect-ratio: 16 / 9; background: #000; border-radius: 0 0 12px 12px; overflow: hidden; }
+.rp-videobox iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.rp-one { position: relative; }
+.rp-drag { position: absolute; bottom: calc(100% - 2px); transform: translateX(-50%); padding: 3px 9px; border-radius: 999px; background: var(--rp-c1); color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .4s; }
+.rp-drag::after { content: ''; position: absolute; left: 50%; top: 100%; margin-left: -5px; border: 5px solid transparent; border-top-color: var(--rp-c1); }
+.rp-one.hint .rp-drag { opacity: 1; animation: rp-bob 1.6s ease-in-out infinite; }
+.rp-one.hint input::-webkit-slider-thumb { animation: rp-pulse 1.6s ease-in-out infinite; }
+.rp-one.hint input::-moz-range-thumb { animation: rp-pulse 1.6s ease-in-out infinite; }
+@keyframes rp-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+@keyframes rp-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -3px; } }
+@media (prefers-reduced-motion: reduce) { .rp-one.hint .rp-drag, .rp-one.hint input::-webkit-slider-thumb, .rp-one.hint input::-moz-range-thumb { animation: none; } }
+
+/* celu: las tres tarjetas de arriba en una sola, una fila por dato, para que el gráfico asome en la primera pantalla */
+@media (max-width: 640px) {
+  .rp-tiles { gap: 0; grid-template-columns: minmax(0, 1fr); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 2px var(--cds-pad-lg); }
+  .rp-tiles > .rp-card { background: transparent; border: 0; border-radius: 0; padding: 12px 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: center; }
+  .rp-tiles > .rp-card + .rp-card { border-top: 1px solid var(--color-border-line); }
+  .rp-tiles .rp-label { grid-column: 1; }
+  .rp-tiles .rp-delta, .rp-tiles .rp-src { grid-column: 1; margin-top: 2px; }
+  .rp-tiles .rp-big { grid-column: 2; grid-row: 1 / span 2; margin: 0; font-size: 28px; text-align: right; white-space: nowrap; }
+  .rp-tiles .rp-big small { font-size: 13px; }
+  .rp-tiles .rp-alertcard { border-top-width: 0; }
+  .rp-tiles > .rp-card.rp-alertcard + .rp-card, .rp-tiles > .rp-card + .rp-card.rp-alertcard { border-top: 1px solid var(--color-border-line); }
+}
+@media (max-width: 859px) { .rp-simout .ghost { display: none; } }
+.rp-hint { margin: 0 0 var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.rp-one input { -webkit-appearance: none; appearance: none; display: block; height: 28px; background: transparent; margin: 0; width: 100%; }
+.rp-one input::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--color-border-line) 0 var(--b), color-mix(in srgb, var(--rp-sim) 45%, transparent) var(--b) 100%); }
+.rp-one input::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--color-border-line) 0 var(--b), color-mix(in srgb, var(--rp-sim) 45%, transparent) var(--b) 100%); }
+.rp-one input::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -8px; border-radius: 50%; background: var(--rp-c1); border: 3px solid var(--color-panel); box-shadow: 0 0 0 1px var(--rp-c1); cursor: grab; }
+.rp-one input::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--rp-c1); border: 3px solid var(--color-panel); box-shadow: 0 0 0 1px var(--rp-c1); cursor: grab; }
+.rp-one.sim input::-webkit-slider-thumb { background: var(--rp-sim); box-shadow: 0 0 0 1px var(--rp-sim); }
+.rp-one.sim input::-moz-range-thumb { background: var(--rp-sim); box-shadow: 0 0 0 1px var(--rp-sim); }
+.rp-onecap { position: relative; height: 26px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.rp-onecap .a { position: absolute; left: 0; top: 4px; white-space: nowrap; }
+@media (max-width: 859px) { .rp-onecap .a { display: none; } }
+.rp-onecap .b { position: absolute; top: 0; right: 0; display: flex; align-items: center; gap: 8px; white-space: nowrap; color: var(--color-warn); font-weight: 600; }
+.rp-colhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.rp-colhead .rp-coltitle { margin: 0; }
+.rp-colhead .rp-seg { flex: none; }
+.rp-colhead .rp-seg button { white-space: nowrap; }
+.rp-coltitle { margin: 0 0 6px; font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+.rp-colhead { min-height: 34px; }
+.rp-damnote { margin: var(--cds-gap-lg) 0 0; }
+.rp-pof .rp-text { margin: 4px 0 6px; }
+.rp-damnote a { color: inherit; text-decoration: underline; text-underline-offset: 2px; white-space: nowrap; }
+.rp-tb { min-height: 34px; display: flex; align-items: center; }
+.rp-damhead { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; height: 32px; white-space: nowrap; }
+.rp-damhead .rp-play { flex: none; }
+.rp-damwhen { font-size: var(--cds-font-size-body); font-weight: 600; margin-right: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.rp-damwhen.sim { color: var(--rp-sim); font-weight: 600; border: 1px solid currentColor; border-radius: 999px; padding: 1px 10px; font-size: var(--cds-font-size-caption); letter-spacing: .02em; }
+.rp-back { background: none; border: 0; padding: 3px 4px; font: inherit; font-size: var(--cds-font-size-caption); color: var(--rp-c1); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.rp-dambox { position: relative; margin-top: 6px; touch-action: pan-y; }
+.rp-damcap { position: absolute; left: 0; right: 0; margin: 0; font-size: 12px; line-height: 1.35; color: var(--color-fg-muted); }
+.rp-damcap b { color: var(--color-fg); }
+.rp-damcap.closed, .rp-damcap.closed b { color: var(--color-warn); }
+.rp-dambox:focus { outline: none; }
+.rp-dambox:focus-visible { outline: 2px solid var(--rp-c1); outline-offset: 4px; border-radius: 8px; }
+.rp-dambox svg { display: block; }
+.rp-handle { position: absolute; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px 4px 7px; border-radius: 999px; background: var(--color-panel); border: 1px solid var(--color-border-line); box-shadow: none; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--color-fg); pointer-events: none; user-select: none; z-index: 2; padding-left: 9px; }
+.rp-handle .ar { color: var(--rp-c1); font-size: 13px; }
+.rp-handle:active { box-shadow: 0 0 0 3px color-mix(in srgb, var(--rp-c1) 25%, transparent), 0 4px 12px rgba(0,0,0,.12); }
+#grafico .rp-simout { margin-top: var(--cds-gap-sm); }
+.rp-rainh { margin: var(--cds-gap-lg) 0 2px; font-size: var(--cds-font-size-heading); font-weight: 600; }
+.rp-rain.dim { opacity: .45; }
+#grafico { --rp-rn: #2f7a72; --rp-sim: #7b4fc9; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #grafico { --rp-rn: #4f9a90; --rp-sim: #a888e8; } }
+:root[data-theme="dark"] #grafico { --rp-rn: #4f9a90; --rp-sim: #a888e8; }
+/* rojo de evacuación más rojo que el naranja de alerta (modo claro) */
+.rp { --color-bad: #d81e1e; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rp { --color-bad: #ef6f61; } }
+:root[data-theme="dark"] .rp { --color-bad: #ef6f61; }
+#grafico .rp-xsdate { min-height: 1.4em; margin-top: var(--cds-gap-sm); font-weight: 600; }
+.rp-sw.sim { border-top-style: dashed; color: var(--color-fg-muted); }
 .rp-prono { margin-top: var(--cds-gap-md); padding: var(--cds-pad-sm) var(--cds-pad-md); background: var(--color-bg); border-radius: var(--cds-radius); }
 .rp-prono .rp-text { margin: 0; }
-@media (max-width: 859px) {
-  #grafico .rp-duo { display: flex; flex-direction: column; gap: 0; }
-  #grafico .rp-duo-a, #grafico .rp-duo-b { display: contents; }
-  #grafico .rp-duo-a > .rp-cardhead { order: 1; }
-  #grafico .rp-duo-a > .rp-note { order: 2; }
-  #grafico #chart { order: 3; }
-  #grafico #legend { order: 4; }
-  #grafico #rio-negro > h2 { order: 5; margin-top: var(--cds-gap-md); padding-top: var(--cds-gap-md); border-top: 1px solid var(--color-border-line); }
-  #grafico #xs-date { order: 6; }
-  #grafico #xs { order: 7; }
-  #grafico .rp-slider { order: 8; }
-  #grafico #rio-negro > .rp-note { order: 9; }
-  #grafico #rio-negro > .rp-src { order: 10; }
-  #grafico #pronostico { order: 11; }
-  #grafico .rp-duo-a > .rp-src { order: 12; }
-}
 .rp-satbox { touch-action: pan-y; cursor: ew-resize; }
 .rp-sathandle { position: absolute; top: 50%; left: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #333; pointer-events: none; }
 .rp-fresh { display: inline-flex; align-items: center; gap: 10px; margin-top: var(--cds-gap-md); padding: 8px 16px; border-radius: 999px; background: var(--color-panel); border: 1px solid var(--color-border-line); font-size: var(--cds-font-size-heading); }
@@ -121,8 +256,17 @@
 .rp-simout { margin: var(--cds-gap-sm) 0 0; padding: var(--cds-pad-sm) var(--cds-pad-md); background: var(--color-bg); border-left: 3px solid var(--color-border-line); border-radius: var(--cds-radius); font-size: var(--cds-font-size-body); line-height: 1.45; display: grid; }
 .rp-simout > span { grid-area: 1 / 1; }
 .rp-simout .ghost { visibility: hidden; }
+.rp-simout .mh { display: flex; align-items: baseline; gap: 10px; margin-bottom: 2px; }
+.rp-simout .mnum { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; width: 3.7em; flex: none; white-space: nowrap; }
+.rp-simout .mnum small { font-family: var(--font-anthropic-sans); font-size: var(--cds-font-size-body); color: var(--color-fg-muted); margin-left: 6px; }
+.rp-simout .mlvl { font-weight: 600; }
+.rp-simout .mdesc { display: block; }
+.rp-simout.lv-alerta .mlvl { color: var(--color-warn); }
+.rp-simout.lv-evac .mlvl { color: var(--color-bad); }
 @media (prefers-reduced-motion: no-preference) { .rp-flow { animation: rp-flow 1.2s linear infinite; } }
 @keyframes rp-flow { to { stroke-dashoffset: -24; } }
+@media (prefers-reduced-motion: no-preference) { .rp-spin { animation: rp-spin 1.2s linear infinite; } }
+@keyframes rp-spin { to { transform: rotate(360deg); } }
 .rp-simout.lv-alerta { border-left-color: var(--color-warn); }
 .rp-simout.lv-evac { border-left-color: var(--color-bad); }
 .rp-simout b { font-weight: 600; }
@@ -132,7 +276,7 @@
 .rp-rainhead { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-bottom: var(--cds-gap-xs); }
 .rp-rain.on #rain-note { color: var(--color-warn); }
 #rain-note { line-height: 1.45; min-height: 4.35em; }
-.rp-raindays { display: grid; grid-template-columns: minmax(0, 1fr); margin-top: var(--cds-gap-sm); border-top: 1px solid var(--color-border-line); }
+.rp-raindays { display: grid; grid-template-columns: minmax(0, 1fr); margin-top: 0; border-top: 1px solid var(--color-border-line); }
 .rp-rday { display: grid; grid-template-columns: 3.4rem 44px minmax(0, 1fr) auto; align-items: center; gap: var(--cds-gap-sm); padding: 8px 4px 8px 10px; border-bottom: 1px solid var(--color-border-line); font-size: var(--cds-font-size-caption); line-height: 1.35; }
 .rp-rday .dd { color: var(--color-fg-muted); text-transform: capitalize; }
 .rp-rday svg { display: block; width: 44px; height: 36px; }
@@ -152,91 +296,81 @@
 
 <div class="rp">
   <header class="rp-head" id="inicio">
-    <h1>Crecida del Paraná en Resistencia y Barranqueras</h1>
-    <p class="rp-sub" id="rp-sub">Seguimiento diario de la crecida del Paraná y de cómo puede afectar al Río Negro en Resistencia. Junta en un solo lugar los datos oficiales (Prefectura, INA, APA y Servicio Meteorológico) para que puedas planificar con información confiable.</p>
+    <h1>Crecida del Paraná y cómo afecta al Río Negro</h1>
     <div class="rp-fresh" id="fresh" data-source="situacion"><span class="rp-fresh-dot"></span><span>Última actualización: <b id="fresh-txt">—</b></span></div>
-    <p class="rp-freshnote">Se actualiza solo cuatro veces por día, a las 9, 12, 16 y 20 horas, tomando los datos de las fuentes oficiales.</p>
+    <p class="rp-freshnote">Se actualiza automáticamente cuatro veces por día, a las 9, 12, 16 y 20 horas, con datos de fuentes oficiales.</p>
   </header>
 
   <section class="rp-tiles" id="hoy">
     <div class="rp-card">
-      <div class="rp-label">Paraná en Barranqueras, <span id="hoy-fecha">hoy</span></div>
+      <div class="rp-label">Altura actual del Paraná en Barranqueras</div>
       <div class="rp-big"><span class="dash-skeleton" data-source="resumen" data-field="altura_m" data-row="0">—</span> <small>metros</small></div>
       <div class="rp-delta" id="delta-dia"></div>
     </div>
     <div class="rp-card rp-alertcard">
       <div class="rp-label">Le falta subir para el nivel de alerta</div>
       <div class="rp-big"><span class="dash-skeleton" data-source="resumen" data-field="falta_alerta_m" data-row="0">—</span> <small>metros</small></div>
-      <div class="rp-delta" style="color: var(--color-fg-muted)">Es la alerta oficial del INA y Prefectura: cuando el Paraná llega a 6 m en Barranqueras. Desde ahí la APA cierra las compuertas del Río Negro.</div>
       <div class="rp-delta" id="ritmo"></div>
     </div>
     <div class="rp-card">
       <div class="rp-label">Río Negro: compuertas del dique</div>
       <div class="rp-big rp-gate" id="gate-tile"><span class="dash-skeleton" data-source="situacion" data-field="compuertas_rio_negro" data-row="0">—</span></div>
-      <div><span class="rp-pill" id="alerta-pill">Aviso de la APA para la costa: <span data-source="situacion" data-field="alerta_apa" data-row="0">—</span></span></div>
-      <p class="rp-src">Fuente: <a id="src-apa" href="https://www.diariolavozdelchaco.com/2026/10/10/alerta-por-crecida-del-parana-apa-pidio-anticipar-medidas-en-las-zonas-riberenas/" target="_blank" rel="noopener">APA Chaco</a></p>
+      <p class="rp-src">Fuente: <a class="src-apa" href="https://www.diariolavozdelchaco.com/2026/10/10/alerta-por-crecida-del-parana-apa-pidio-anticipar-medidas-en-las-zonas-riberenas/" target="_blank" rel="noopener">APA Chaco, vía La Voz del Chaco (10 oct)</a></p>
     </div>
   </section>
 
   <section class="rp-card" id="grafico">
-    <div class="rp-duo">
-      <div class="rp-duo-a">
-        <div class="rp-cardhead">
-          <h2>El Paraná en Barranqueras</h2>
+    <p class="rp-hint">Mové la barra para ver otras fechas. Si la llevás hasta la parte violeta, simulás qué pasaría si el Paraná sigue subiendo.</p>
+    <div class="rp-split">
+      <div class="rp-split-a">
+        <div class="rp-colhead rp-ta">
+          <h2 class="rp-coltitle">El Paraná en Barranqueras</h2>
           <div class="rp-seg" role="group" aria-label="Período">
-            <button type="button" data-range="30" aria-pressed="true">1 mes</button>
+            <button type="button" data-range="15" aria-pressed="true">15 días</button>
             <button type="button" data-range="104" aria-pressed="false">3 meses</button>
           </div>
         </div>
-        <p class="rp-note">Un dato por día. Lo sombreado es el pronóstico oficial.</p>
-        <div class="rp-chartbox" id="chart" data-source="parana_barranqueras pronostico umbrales"></div>
-        <div class="rp-legend" id="legend">
-          <span><i class="rp-sw" id="sw-parana"></i>Paraná (medido)</span>
-          <span><i class="rp-sw band" id="sw-band"></i>Pronóstico</span>
+        <div class="rp-chartwrap">
+          <div class="rp-chartbox rp-river" id="chart" aria-label="Gráfico de la altura del Paraná. Usá la barra de abajo para moverte por los días." data-source="parana_barranqueras pronostico umbrales situacion"></div>
         </div>
-        <div class="rp-slider">
-          <label for="dia">Mové la barra para elegir un día</label>
-          <input id="dia" type="range" min="0" max="0" step="1" value="0" aria-label="Elegí un día">
-        </div>
-        <div class="rp-prono" id="pronostico">
-          <p class="rp-text"><b>Pronóstico:</b> <span data-source="situacion" data-field="pronostico_texto" data-row="0">—</span></p>
-          <p class="rp-note" id="estimacion"></p>
+        <p class="rp-simout" id="sim-out" aria-live="polite"></p>
+        <div class="rp-pof" id="pronostico">
+          <h3 class="rp-rainh">Pronóstico oficial</h3>
+          <p class="rp-text"><span data-source="situacion" data-field="pronostico_texto" data-row="0">—</span></p>
           <p class="rp-note">Corrientes, río arriba, está en <span data-source="situacion" data-field="corrientes_m" data-row="0">—</span> m. Lo que sube allá suele verse en Barranqueras poco después.</p>
         </div>
-        <p class="rp-src">Fuentes: <a href="https://fich.unl.edu.ar/cim/rios/historico/25" target="_blank" rel="noopener">Prefectura Naval Argentina (vía FICH‑UNL)</a> · <a href="https://www.ina.gob.ar/alerta/" target="_blank" rel="noopener">Instituto Nacional del Agua (INA)</a></p>
       </div>
-      <div class="rp-duo-b" id="rio-negro">
-        <h2>Cómo afecta al Río Negro</h2>
-        <div class="rp-xsdate" id="xs-date">—</div>
-        <div class="rp-xsbox" id="xs" data-source="parana_barranqueras pronostico situacion umbrales"></div>
-        <p class="rp-note"><b>Dique regulador del Río Negro</b>, en Barranqueras. Forma parte de las defensas de la ciudad, pensadas para aguantar hasta 9,50 m. Hoy: estado informado por la APA. Otros días: según su manual, que cierra las compuertas cuando el Paraná supera 6 m.</p>
-        <p class="rp-src">Fuente: <a href="https://litigio.com.ar/2026/03/19/piden-a-la-justicia-que-prohiba-a-la-apa-desviar-el-rio-negro-hacia-el-salado/" target="_blank" rel="noopener">Manual de Operaciones de la APA (Res. 049/02)</a></p>
-      </div>
-    </div>
-  </section>
-
-  <section class="rp-card" id="simulacion">
-    <div class="rp-duo">
-      <div class="rp-duo-a">
-        <h2><span class="rp-simtag">Simulación</span><span>¿Y si el Paraná llega a <span id="sim-val">7,00</span> m?</span></h2>
-        <p class="rp-note">No es un pronóstico: sirve para saber de antemano qué pasaría a cada altura.</p>
-        <p class="rp-simout" id="sim-out"></p>
-        <div class="rp-xsbox" id="xs-sim" data-source="umbrales"></div>
-        <p class="rp-note"><b>Dique regulador del Río Negro</b> (Barranqueras). Las defensas están pensadas para aguantar hasta 9,50 m.</p>
-        <div class="rp-slider">
-          <div class="rp-simctl"><label for="sim">Mové la barra para elegir una altura</label><button type="button" class="rp-play" id="sim-play" aria-label="Pausar la animación">❚❚ Pausar</button></div>
-          <input id="sim" class="rp-simrange" type="range" min="3" max="9" step="0.1" value="7" aria-label="Altura simulada del Paraná">
+      <div class="rp-split-b">
+        <h2 class="rp-coltitle rp-tb">Cómo afecta al Río Negro</h2>
+        <div class="rp-damwrap">
+        <div class="rp-damhead">
+          <span class="rp-damwhen" id="dam-when">—</span>
+        </div>
+        <div class="rp-dambox" id="dam" aria-label="Dique del Río Negro: el Paraná de un lado, el Río Negro del otro.">
+          <p class="rp-damcap" id="dam-cap"></p>
+          <div class="rp-handle" id="dam-handle" aria-hidden="true" hidden style="display:none"><span class="v" id="dam-handle-v">—</span></div>
+        </div>
+        </div>
+        <div class="rp-brest">
+        <div class="rp-rain dim" id="lluvia" data-source="lluvia">
+          <div class="rp-raindays" id="rain-days"></div>
+        </div>
+        <p class="rp-note rp-damnote"><b>Dique regulador del Río Negro</b>, en Barranqueras. Forma parte de las defensas de la ciudad, pensadas para aguantar hasta 9,50 m. <a href="https://www.youtube.com/watch?v=kfi0U468nVk" target="_blank" rel="noopener" id="dron-link">▶ Verlo desde un dron</a></p>
+        <dialog class="rp-video" id="dron">
+          <div class="rp-videohead"><span>Dique regulador del Río Negro, desde un dron</span><button type="button" id="dron-x" aria-label="Cerrar">✕</button></div>
+          <div class="rp-videobox" id="dron-box"></div>
+        </dialog>
         </div>
       </div>
-      <div class="rp-duo-b rp-rain" id="lluvia" data-source="lluvia">
-        <h2>Lluvia en Resistencia</h2>
-        <p class="rp-note" id="rain-note">Según el Servicio Meteorológico Nacional (SMN).</p>
-        <div class="rp-raindays" id="rain-days"></div>
-        <p class="rp-note" id="rain-expl">Dibujo y texto: Servicio Meteorológico Nacional. Milímetros y %: Meteored, solo como referencia.</p>
-        <p class="rp-src">Fuente: <a href="https://www.smn.gob.ar/" target="_blank" rel="noopener">Servicio Meteorológico Nacional</a> · <a href="https://www.meteored.com.ar/tiempo-en_Resistencia-America+Sur-Argentina-Chaco-SARE-1-16890.html" target="_blank" rel="noopener">Meteored</a></p>
+      <div class="rp-one" id="one">
+        <span class="rp-drag" id="drag" aria-hidden="true">Arrastrame</span>
+        <input id="dia" type="range" min="0" max="1000" step="any" value="0" aria-label="Elegí un día o, más a la derecha, simulá que el Paraná sigue subiendo">
       </div>
     </div>
+    <p class="rp-src">Fuentes: <a href="https://fich.unl.edu.ar/cim/rios/historico/25" target="_blank" rel="noopener" title="Prefectura Naval Argentina, vía FICH‑UNL">altura</a> · <a href="https://www.ina.gob.ar/alerta/" target="_blank" rel="noopener" title="Instituto Nacional del Agua (INA)">pronóstico</a> · <a href="https://litigio.com.ar/2026/03/19/piden-a-la-justicia-que-prohiba-a-la-apa-desviar-el-rio-negro-hacia-el-salado/" target="_blank" rel="noopener" title="Manual de Operaciones de la APA (Res. 049/02), citado por Litigio">cierre del dique a 6 m</a> · <a href="https://www.smn.gob.ar/" target="_blank" rel="noopener" title="Servicio Meteorológico Nacional">lluvia</a> · <a href="https://www.meteored.com.ar/tiempo-en_Resistencia-America+Sur-Argentina-Chaco-SARE-1-16890.html" target="_blank" rel="noopener" title="Meteored, estimación no oficial">milímetros</a></p>
   </section>
+
+
 
   <section class="rp-card" id="historia">
     <h2>¿Cómo se compara con la inundación del 83?</h2>
@@ -273,32 +407,31 @@
           <div class="rp-sathandle" id="sat-handle" aria-hidden="true">‹ ›</div>
           <span class="rp-satlab l" id="sat-lab-a"></span>
           <span class="rp-satlab r" id="sat-lab-b"></span>
-          <span class="rp-satpin" style="left: 48.8%; top: 48.7%;" title="Villa Río Negro"></span>
+          <span class="rp-satpin" style="left: 77.4%; top: 66%;" title="Dique regulador del Río Negro"></span>
+          <span class="rp-satpintxt" style="left: 77.4%; top: 66%;">Dique</span>
         </div>
         <input id="sat-range" type="hidden" value="50">
         <p class="rp-src">Fuente: <a href="https://worldview.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA (satélites Landsat y Sentinel‑2)</a></p>
       </div>
       <div class="rp-duo-b">
         <h2>Qué mirar en esta zona</h2>
-        <p class="rp-text">El punto rojo marca Villa Río Negro, dentro de las defensas del Gran Resistencia. Acá el riesgo no es el Paraná sino el <b>Río Negro</b> (la línea verde que serpentea), sobre todo si <b>llueve mucho con las compuertas cerradas</b>.</p>
-        <h3 class="rp-h3 rp-sub3">El Río Negro hoy</h3>
-        <p class="rp-text" data-source="situacion" data-field="resumen" data-row="0">—</p>
+        <p class="rp-text">El punto rojo marca el <b>dique regulador</b>, donde el Río Negro desemboca en el Paraná (el agua marrón, abajo a la derecha). El <b>Río Negro</b> es la línea verde que serpentea por el norte de la ciudad: con las <b>compuertas cerradas y mucha lluvia</b>, es el que puede subir.</p>
         <p class="rp-note">El satélite pasa cada 2 o 3 días y solo se muestran los días sin nubes, por eso la imagen puede tener algunos días de atraso. Cada punto de la imagen equivale a unos 30 metros.</p>
         <div class="rp-links">
-          <a href="https://www.google.com/maps/@-27.4314352,-58.9813207,16z/data=!3m1!1e3" target="_blank" rel="noopener">Ver en Google Maps ↗</a>
+          <a href="https://www.google.com/maps/@-27.456517,-58.898833,16z/data=!3m1!1e3" target="_blank" rel="noopener">Ver en Google Maps ↗</a>
         </div>
       </div>
     </div>
   </section>
 
   <footer class="rp-foot">
-    <p>Último dato: <span data-source="situacion" data-field="fecha" data-row="0">—</span>.</p>
     <p>Ante una emergencia, seguí las indicaciones de Defensa Civil y de tu municipio.</p>
     <p class="rp-sign">Pablo Dodda · © 2026</p>
   </footer>
 </div>
 
 <script>
+document.title = 'Crecida del Paraná y cómo afecta al Río Negro';
 window.rpLocale = d3.formatLocale({ decimal: ',', thousands: '.', grouping: [3], currency: ['$', ''] });
 window.rpFmt2 = window.rpLocale.format('.2f');
 window.rpFmtCm = window.rpLocale.format('+d');
@@ -335,46 +468,175 @@ dash.calc('resumen', {
   }
 });
 
-window.rpState = { range: 30, idx: null };
+window.rpState = { range: 15, idx: null };
 </script>
 
 <script>
 (() => {
   const segBtns = document.querySelectorAll('.rp-seg button');
-  const slider = document.getElementById('dia');
   const box = document.getElementById('chart');
-  const xs = document.getElementById('xs');
+  const dbox = document.getElementById('dam');
+  const handle = document.getElementById('dam-handle');
   const S = window.rpState;
+  S.sim = null; // altura simulada (sin fecha); null = se muestra el día elegido en el gráfico
   const F2 = window.rpFmt2;
-  let series = [];   // [{date, h, lo, hi, kind}]
-  let lastCtx = null;
+  const DAM_TOP = 9.5, SIM_MIN = 2.5;
+  let series = [];   // [{date, h, lo, hi, kind: obs | prono}]
+  let C = null;      // contexto del gráfico de fechas
+  let D = null;      // contexto del dique
+  let yDom = [2, DAM_TOP + 0.9];
+  const still = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // ---- una sola barra: hasta B elige el día (debajo del gráfico); de B en adelante simula que el Paraná sigue subiendo ----
+  const dia = document.getElementById('dia'), one = document.getElementById('one');
+  const L = { B: 650 }; // en unidades de la barra (0..1000)
+  const hEnd = () => series.length ? series[series.length - 1].h : 5;
+  function applyV(v) {
+    if (!C) return;
+    if (v <= L.B) { C.pickPx(C.left + v / L.B * (C.W - C.right - C.left)); return; }
+    const n = series.length - 1;
+    S.sim = hEnd() + (v - L.B) / (1000 - L.B) * (DAM_TOP - hEnd()); S.t = n; S.idx = n; update();
+  }
+  dia.addEventListener('input', () => applyV(Number(dia.value)));
+
+  // ---- la barra se mueve sola una vez, despacio, para mostrar cómo funciona; se corta apenas la persona la toca ----
+  const AUTO = { raf: 0, done: false };
+  // al terminar la animación, la barra invita a moverla: un cartelito arriba del botón y el botón que late
+  let touched = false;
+  function placeHint() {
+    const r = dia.getBoundingClientRect(), o = one.getBoundingClientRect();
+    document.getElementById('drag').style.left = (r.left - o.left + 10 + Number(dia.value) / 1000 * (r.width - 20)) + 'px';
+  }
+  function showHint() { if (touched) return; placeHint(); one.classList.add('hint'); }
+  function hideHint() { touched = true; one.classList.remove('hint'); }
+  ['pointerdown', 'touchstart', 'keydown', 'input'].forEach((ev) => dia.addEventListener(ev, (e) => { if (e.isTrusted) hideHint(); }, { passive: true }));
+  window.addEventListener('resize', () => { if (one.classList.contains('hint')) placeHint(); });
+  function stopAuto() { if (AUTO.raf) cancelAnimationFrame(AUTO.raf); AUTO.raf = 0; AUTO.done = true; one.classList.remove('auto'); }
+  function todayV() {
+    const i = series.findLastIndex((q) => q.kind === 'obs');
+    return (C.x(series[i].date) - C.left) / (C.W - C.right - C.left) * L.B;
+  }
+  function startAuto() {
+    if (still()) { AUTO.done = true; showHint(); return; }
+    if (AUTO.done) return;
+    if (!C || !series.length) { setTimeout(startAuto, 500); return; }
+    AUTO.done = true; one.classList.add('auto');
+    const vt = todayV();
+    // tramos: días (lento) → simulación → pausa arriba → vuelve a hoy
+    const legs = [[0, L.B, 16000], [L.B, 1000, 9000], [1000, 1000, 2200], [1000, vt, 2600]];
+    let k = 0, t0 = null, last = null;
+    const step = (now) => {
+      if (t0 == null) t0 = now;
+      // si la barra sale de la pantalla, la animación se pausa y sigue cuando vuelve
+      if (!AUTO.vis) { if (last != null) t0 += now - last; last = now; AUTO.raf = requestAnimationFrame(step); return; }
+      if (last != null) { last = null; }
+      const [a, b, d] = legs[k], f = Math.min(1, (now - t0) / d);
+      const e = k === 3 ? d3.easeCubicInOut(f) : f;
+      applyV(a + (b - a) * e);
+      if (f >= 1) { k++; t0 = now; }
+      if (k >= legs.length) {
+        S.sim = null; S.idx = series.findLastIndex((q) => q.kind === 'obs'); S.t = S.idx; update();
+        AUTO.raf = 0; one.classList.remove('auto'); showHint(); return;
+      }
+      AUTO.raf = requestAnimationFrame(step);
+    };
+    AUTO.raf = requestAnimationFrame(step);
+  }
+  ['pointerdown', 'touchstart', 'keydown', 'wheel'].forEach((ev) => dia.addEventListener(ev, stopAuto, { passive: true }));
+  // arranca recién cuando el gráfico y la barra están enteros en pantalla (no al abrir la página)
+  AUTO.vis = false;
+  if ('IntersectionObserver' in window) {
+    let timer = 0;
+    const io = new IntersectionObserver((es) => {
+      const e = es[es.length - 1];
+      AUTO.vis = e.isIntersecting && e.intersectionRatio > 0.99;
+      if (AUTO.vis && !AUTO.done && !timer) timer = setTimeout(() => { timer = 0; if (AUTO.vis) startAuto(); }, 600);
+      if (AUTO.done && !AUTO.raf) io.disconnect();
+    }, { threshold: [0, 1], rootMargin: '0px 0px -8% 0px' });
+    io.observe(one);
+  } else { AUTO.vis = true; setTimeout(startAuto, 900); }
+
+  // ---- video del dron en una ventana, con reproducción automática y sin sonido ----
+  {
+    const link = document.getElementById('dron-link'), dlg = document.getElementById('dron'), vbox = document.getElementById('dron-box');
+    if (link && dlg && dlg.showModal) {
+      const close = () => { dlg.close(); };
+      link.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return; // abrir en otra pestaña sigue funcionando
+        e.preventDefault();
+        const f = document.createElement('iframe');
+        f.src = 'https://www.youtube-nocookie.com/embed/kfi0U468nVk?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1';
+        f.title = 'Dique regulador del Río Negro desde un dron';
+        f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+        f.allowFullscreen = true;
+        vbox.replaceChildren(f);
+        dlg.showModal();
+      });
+      document.getElementById('dron-x').addEventListener('click', close);
+      dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); });
+      dlg.addEventListener('close', () => vbox.replaceChildren());
+    }
+  }
+  function layoutOne() {
+    if (!C) return;
+    const THUMB = 10, side = window.matchMedia('(min-width: 860px)').matches;
+    const br = box.getBoundingClientRect(), sc = br.width / C.W, or = one.getBoundingClientRect();
+    if (side) {
+      // la parte de los días queda exactamente debajo del eje del gráfico: el botón está siempre debajo del punto
+      const x0 = br.left + C.left * sc, x1 = br.left + (C.W - C.right) * sc, x2 = dbox.getBoundingClientRect().right;
+      dia.style.marginLeft = (x0 - or.left - THUMB) + 'px';
+      dia.style.width = (x2 - x0 + 2 * THUMB) + 'px';
+      L.B = (x1 - x0) / (x2 - x0) * 1000;
+    } else {
+      dia.style.marginLeft = '0px'; dia.style.width = '100%';
+      L.B = 650;
+    }
+    const tw = dia.getBoundingClientRect().width, pct = (THUMB + L.B / 1000 * (tw - 2 * THUMB)) / tw * 100;
+    one.style.setProperty('--b', pct + '%');
+  }
+  window.addEventListener('resize', () => { layoutOne(); update(); });
+  const _lo = layoutOne; layoutOne = function () { _lo(); if (one.classList.contains('hint')) placeHint(); };
   segBtns.forEach((b) => b.addEventListener('click', () => {
+    stopAuto();
     S.range = Number(b.dataset.range);
     segBtns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     S.idx = null;
     draw();
   }));
-  slider.addEventListener('input', () => { S.idx = Number(slider.value); drawSelection(); });
-  const simIn = document.getElementById('sim'), xsSim = document.getElementById('xs-sim');
-  simIn.addEventListener('input', drawSim);
-  // Autoplay lento: sube y baja solo; se detiene cuando alguien toca la barra
-  const playBtn = document.getElementById('sim-play');
-  let auto = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches), dirSim = 1;
-  const setBtn = () => { playBtn.textContent = auto ? '❚❚ Pausar' : '▶ Reproducir'; playBtn.setAttribute('aria-label', auto ? 'Pausar la animación' : 'Reproducir la animación'); };
-  const stopAuto = () => { auto = false; setBtn(); };
-  ['pointerdown', 'keydown', 'touchstart'].forEach((ev) => simIn.addEventListener(ev, stopAuto, { passive: true }));
-  playBtn.addEventListener('click', () => { auto = !auto; setBtn(); });
-  setBtn();
-  setInterval(() => {
-    if (!auto) return;
-    let v = Number(simIn.value) + 0.1 * dirSim;
-    if (v >= 9) { v = 9; dirSim = -1; }
-    if (v <= 3) { v = 3; dirSim = 1; }
-    simIn.value = v.toFixed(1);
-    drawSim();
-  }, 650);
 
+  // ---- interacción: gráfico de fechas (izquierda/derecha) ----
+  const selectDay = (t) => { stopPlay(); S.sim = null; S.t = Math.max(0, Math.min(series.length - 1, t)); S.idx = Math.round(S.t); update(); };
+  window.rpSelect = selectDay; window.rpCount = () => series.length;
+
+  // ---- interacción: dique (arriba/abajo) = simulación ----
+  // las dos barras se mueven juntas: una altura que el Paraná tuvo (o tiene pronosticada) mueve el gráfico de fechas
+  // al último día con esa altura; si es más alta que el final del pronóstico, el gráfico queda clavado a la derecha y se simula
+  const setSim = (h) => {
+    h = Math.max(SIM_MIN, Math.min(DAM_TOP, h));
+    const n = series.length - 1;
+    if (n < 0) return;
+    let t = null;
+    if (h <= series[n].h + 1e-6) {
+      for (let i = n - 1; i >= 0; i--) {
+        const a = series[i].h, b = series[i + 1].h;
+        if ((h - a) * (h - b) <= 0) { t = a === b ? i + 1 : i + (h - a) / (b - a); break; }
+      }
+    }
+    if (t != null) { S.sim = null; S.t = t; S.idx = Math.round(t); }
+    else { S.sim = h; S.t = h > series[n].h ? n : 0; S.idx = Math.round(S.t); }
+    update();
+  };
+  window.rpSim = (h) => { stopPlay(); setSim(h); };
+  // la barra es lo único que se mueve: sin hover, sin arrastrar el agua, sin botón de reproducir
+  const stopPlay = () => {}, setBtn = () => {};
+
+  function currentH() {
+    if (S.sim != null) return S.sim;
+    const t = S.t ?? S.idx, i0 = Math.floor(t), i1 = Math.min(series.length - 1, i0 + 1);
+    return series[i0] ? series[i0].h + (series[i1].h - series[i0].h) * (t - i0) : 5;
+  }
+
+  // ---- datos ----
   function build() {
     const p = dash.data('parana_barranqueras'), f = dash.data('pronostico');
     if (p.status !== 'ok') return null;
@@ -383,8 +645,7 @@ window.rpState = { range: 30, idx: null };
     if (f.status === 'ok' && f.data.length) {
       const pts = f.data.map((d) => ({ date: window.rpParse(d.fecha), lo: Number(d.min_m), hi: Number(d.max_m) })).sort((a, b) => a.date - b.date);
       const last = obs[obs.length - 1];
-      const anchor = { date: last.date, lo: last.h, hi: last.h };
-      const all = [anchor, ...pts.filter((q) => q.date > last.date)];
+      const all = [{ date: last.date, lo: last.h, hi: last.h }, ...pts.filter((q) => q.date > last.date)];
       for (let i = 1; i < all.length; i++) {
         const a = all[i - 1], b = all[i];
         const days = Math.round((b.date - a.date) / 864e5);
@@ -397,204 +658,367 @@ window.rpState = { range: 30, idx: null };
     }
     return out;
   }
-
   function umbrales() {
     const u = dash.data('umbrales');
     return u.status === 'ok' ? u.data.map((d) => ({ ...d, altura_m: Number(d.altura_m) })) : [];
   }
+  function gateRule() {
+    const U = umbrales();
+    return { U, cierre: (U.find((u) => u.tipo === 'alerta') || {}).altura_m || 6 };
+  }
+  // compuertas: hoy, lo que informa la APA; otros días y simulación, la regla del manual (cierre a 6 m)
+  function isOpen(d, h) {
+    const { cierre } = gateRule();
+    if (d) {
+      const st = dash.data('situacion');
+      const sit = st.status === 'ok' && st.data[0] ? st.data[0] : null;
+      const isLatest = d.kind === 'obs' && d === series.findLast((q) => q.kind === 'obs');
+      const apa = isLatest && sit ? String(sit.compuertas_rio_negro || '') : '';
+      if (/abiert/i.test(apa)) return true;
+      if (/cerrad/i.test(apa)) return false;
+      return !((d.hi ?? d.h) > cierre);
+    }
+    return !(h > cierre);
+  }
 
+  // ================= gráfico de fechas =================
   function draw() {
     const full = build();
     box.classList.toggle('dash-skeleton', !full && dash.data('parana_barranqueras').status === 'loading');
-    if (!full) {
-      box.replaceChildren();
-      if (dash.data('parana_barranqueras').status === 'error') failed(box);
-      xs.replaceChildren();
-      return;
-    }
+    if (!full) { box.replaceChildren(); if (dash.data('parana_barranqueras').status === 'error') failed(box); return; }
     const nObs = full.filter((d) => d.kind === 'obs').length;
     const startIdx = Math.max(0, nObs - S.range);
     series = full.slice(startIdx);
     const lastObsIdx = nObs - 1 - startIdx;
+    const endP = series[series.length - 1];
     if (S.idx == null || S.idx >= series.length) S.idx = lastObsIdx;
-    slider.max = String(series.length - 1);
-    slider.value = String(S.idx);
+    S.t = S.idx;
 
     const W = Math.max(280, box.clientWidth);
-    const narrow = W < 520;
-    const H = narrow ? 260 : 320;
+    const narrow = W < 440;
+    const H = narrow ? 250 : 400;
     box.style.minHeight = H + 'px';
     const U = umbrales();
-    const ymax = Math.max(7, d3.max(series, (d) => d.hi ?? d.h) + 0.4, d3.max(U, (d) => d.altura_m) + 0.5);
-    const ymin = Math.max(0, Math.floor(d3.min(series, (d) => d.lo ?? d.h) - 0.5));
+    const ymin = Math.max(0, Math.min(2, Math.floor(d3.min(series, (d) => d.lo ?? d.h) - 0.5)));
+    yDom = [ymin, DAM_TOP + 0.9];
 
     box.replaceChildren();
-    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Altura del Paraná en Barranqueras por día');
-    const y = d3.scaleLinear([ymin, ymax], [H - 28, 10]);
-    const yTicks = y.ticks(narrow ? 4 : 6);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).style('overflow', 'visible').attr('role', 'img')
+      .attr('aria-label', 'Altura del Paraná en Barranqueras por día y pronóstico');
+    const bottom = H - 44, row1 = bottom + 15, row2 = bottom + 33;
+    const y = d3.scaleLinear(yDom, [bottom, 8]);
     const probe = svg.append('text').attr('font-size', 11).text('10 m');
     const left = Math.ceil(probe.node().getComputedTextLength()) + 10;
     probe.remove();
-    const right = 8;
-    const x = d3.scaleUtc([series[0].date, series[series.length - 1].date], [left, W - right]);
+    const right = 6;
+    const plotW = W - right - left;
+    const fP = narrow ? 0.3 : 0.24; // el pronóstico tiene su propio ancho para que se lea
+    const xA = left + plotW * (1 - fP);
+    const x = d3.scaleUtc([series[0].date, series[lastObsIdx].date, endP.date], [left, xA, W - right]);
+    const todayX = x(series[lastObsIdx].date);
+    const fs = narrow ? 10 : 11;
 
-    const g = svg.append('g');
-    g.selectAll('line.grid').data(yTicks).join('line').attr('x1', left).attr('x2', W - right).attr('y1', y).attr('y2', y).attr('stroke', 'var(--cds-chart-grid)');
-    g.selectAll('text.yt').data(yTicks).join('text').attr('x', left - 6).attr('y', (d) => y(d) + 4).attr('text-anchor', 'end').attr('font-size', 11).attr('fill', 'var(--color-fg-muted)').text((d) => d + ' m');
-    const xTicks = x.ticks(narrow ? 3 : 6);
-    g.selectAll('text.xt').data(xTicks).join('text').attr('x', x).attr('y', H - 8).attr('text-anchor', 'middle').attr('font-size', 11).attr('fill', 'var(--color-fg-muted)').text(window.rpShort);
-    g.append('line').attr('x1', left).attr('x2', W - right).attr('y1', H - 28).attr('y2', H - 28).attr('stroke', 'var(--cds-chart-axis)');
+    const defs = svg.append('defs');
+    const g0 = defs.append('linearGradient').attr('id', 'rp-grad-ch').attr('gradientUnits', 'userSpaceOnUse').attr('x1', 0).attr('x2', 0).attr('y1', y(d3.max(series, (d) => d.h))).attr('y2', bottom);
+    [[0, .46], [.45, .24], [1, .04]].forEach(([o, a]) => g0.append('stop').attr('offset', o).attr('style', `stop-color:${dash.colors[0]};stop-opacity:${a}`));
 
-    // umbrales
-    U.forEach((u) => {
-      if (u.altura_m < ymin) return;
-      const strong = u.tipo === 'alerta' || u.tipo === 'evacuacion';
-      const col = u.tipo === 'evacuacion' ? 'var(--color-bad)' : u.tipo === 'alerta' ? 'var(--color-warn)' : 'var(--cds-chart-reference)';
-      g.append('line').attr('x1', left).attr('x2', W - right).attr('y1', y(u.altura_m)).attr('y2', y(u.altura_m))
-        .attr('stroke', col).attr('stroke-width', strong ? 1.5 : 1).attr('stroke-dasharray', u.tipo === 'evacuacion' ? null : strong ? '6 4' : '2 4').attr('opacity', strong ? 1 : .7);
-      if (strong) {
-        g.append('text').attr('x', left + 6).attr('y', y(u.altura_m) - 5).attr('font-size', 11).attr('font-weight', 600).attr('fill', col)
-          .text(`${String(u.nombre).split(' · ')[0]} ${window.rpLocale.format('.1~f')(u.altura_m)} m`);
-      }
+    const gBg = svg.append('g'), gLines = svg.append('g'), gSel = svg.append('g');
+    const yTicks = y.ticks(narrow ? 4 : 8).filter((t) => t >= ymin);
+    gBg.selectAll('line').data(yTicks).join('line').attr('x1', left).attr('x2', W - right).attr('y1', y).attr('y2', y).attr('stroke', 'var(--cds-chart-grid)');
+    gBg.selectAll('text').data(yTicks).join('text').attr('x', left - 6).attr('y', (d) => y(d) + 4).attr('text-anchor', 'end').attr('font-size', 11).attr('fill', 'var(--color-fg-muted)').text((d) => d + ' m');
+    const xTicks = d3.scaleUtc().domain([series[0].date, series[lastObsIdx].date]).ticks(narrow ? 3 : 5).filter((t) => x(t) < todayX - (narrow ? 34 : 50));
+    const gx = svg.insert('g', ':first-child');
+    gx.selectAll('text').data(xTicks).join('text').attr('x', x).attr('y', row1).attr('text-anchor', 'middle').attr('font-size', fs).attr('fill', 'var(--color-fg-muted)').text(window.rpShort);
+    gBg.append('text').attr('x', todayX).attr('y', row1).attr('text-anchor', 'middle').attr('font-size', fs).attr('font-weight', 600).attr('fill', 'var(--color-fg)').text('hoy');
+    const prDays = series.filter((d) => d.kind === 'prono');
+    // los días del pronóstico llevan el mes, como el resto; se muestran los que entran sin pisarse (el último siempre)
+    const gp = svg.insert('g', ':first-child');
+    let edge = W - 1;
+    prDays.slice().reverse().forEach((d, k) => {
+      const t = gp.append('text').attr('y', row1).attr('font-size', fs).attr('fill', 'var(--color-fg-muted)').text(window.rpShort(d.date));
+      const w = t.node().getComputedTextLength ? t.node().getComputedTextLength() : 34;
+      let x0 = x(d.date) - w / 2;
+      if (k === 0) x0 = Math.min(x0, W - 1 - w);
+      if (x0 + w > edge - 6 && k > 0 || x0 < todayX + 18) { t.remove(); return; }
+      t.attr('x', x0).attr('text-anchor', 'start');
+      edge = x0;
     });
+    // leyenda: la misma línea de cada tramo
+    let flowX = left;
+    const leg = (t, col, dash0) => {
+      const g = gBg.append('g');
+      const tx = g.append('text').attr('y', row2).attr('font-size', fs).attr('fill', 'var(--color-fg-muted)').text(t);
+      const tw = tx.node().getComputedTextLength();
+      g.append('line').attr('x1', flowX).attr('x2', flowX + 18).attr('y1', row2 - 4).attr('y2', row2 - 4).attr('stroke', col).attr('stroke-width', 2.5).attr('stroke-linecap', 'round').attr('stroke-dasharray', dash0);
+      tx.attr('x', flowX + 24);
+      flowX += 24 + tw + 16;
+    };
+    leg('Medido', dash.colors[0], null);
+    leg('Pronóstico', dash.colors[0], '4 4');
+    gBg.append('line').attr('x1', left).attr('x2', W - right).attr('y1', bottom).attr('y2', bottom).attr('stroke', 'var(--cds-chart-axis)');
 
-    // pronóstico
+    // alerta y evacuación
+    U.filter((u) => (u.tipo === 'alerta' || u.tipo === 'evacuacion') && u.altura_m >= ymin).forEach((u) => {
+      const col = u.tipo === 'evacuacion' ? 'var(--color-bad)' : 'var(--color-warn)';
+      gLines.append('line').attr('x1', left).attr('x2', W - right).attr('y1', y(u.altura_m)).attr('y2', y(u.altura_m)).attr('stroke', col).attr('stroke-width', 1.5).attr('stroke-dasharray', u.tipo === 'evacuacion' ? null : '6 4');
+      gLines.append('text').attr('x', left + 6).attr('y', u.tipo === 'alerta' ? y(u.altura_m) + 13 : y(u.altura_m) - 5).attr('font-size', 11).attr('font-weight', 600).attr('fill', col)
+        .text(`${String(u.nombre).split(' · ')[0]} ${window.rpLocale.format('.1~f')(u.altura_m)} m`);
+    });
+    gLines.append('line').attr('x1', todayX).attr('x2', todayX).attr('y1', 8).attr('y2', bottom).attr('stroke', 'var(--color-fg-muted)').attr('stroke-dasharray', '2 3').attr('opacity', .8);
+
+    // medido (con degradé) y pronóstico
+    const obsS = series.filter((d) => d.kind === 'obs');
+    gLines.append('path').datum(obsS).attr('d', d3.area().x((d) => x(d.date)).y0(bottom).y1((d) => y(d.h))).attr('fill', 'url(#rp-grad-ch)');
     const pr = series.filter((d) => d.kind === 'prono');
     if (pr.length) {
       const anchor = series[lastObsIdx];
       const band = [{ date: anchor.date, lo: anchor.h, hi: anchor.h }, ...pr];
-      g.append('path').datum(band).attr('d', d3.area().x((d) => x(d.date)).y0((d) => y(d.lo)).y1((d) => y(d.hi)))
-        .attr('fill', dash.colors[0]).attr('opacity', .22);
-      g.append('path').datum(band).attr('d', d3.line().x((d) => x(d.date)).y((d) => y((d.lo + d.hi) / 2)))
-        .attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 2).attr('stroke-dasharray', '5 4');
-      g.append('line').attr('x1', x(anchor.date)).attr('x2', x(anchor.date)).attr('y1', 10).attr('y2', H - 28).attr('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '2 3');
-      g.append('text').attr('x', x(anchor.date) + 4).attr('y', H - 34).attr('font-size', 10).attr('fill', 'var(--color-fg-muted)').text('hoy');
+      gLines.append('path').datum(band).attr('d', d3.area().x((d) => x(d.date)).y0((d) => y(d.lo)).y1((d) => y(d.hi))).attr('fill', dash.colors[0]).attr('opacity', .22);
+      gLines.append('path').datum(band).attr('d', d3.line().x((d) => x(d.date)).y((d) => y((d.lo + d.hi) / 2))).attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 2).attr('stroke-dasharray', '5 4');
+    }
+    gLines.append('path').datum(obsS).attr('d', d3.line().x((d) => x(d.date)).y((d) => y(d.h)))
+      .attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 2.5).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
+
+    const tip = document.createElement('div'); tip.className = 'rp-tip'; box.appendChild(tip);
+    const pickPx = (px) => {
+      const t = +x.invert(Math.max(left, Math.min(W - right, px))), i0 = Math.max(0, d3.bisector((d) => d.date).right(series, t) - 1);
+      const a = series[i0], b = series[Math.min(series.length - 1, i0 + 1)];
+      selectDay(a === b ? i0 : i0 + Math.max(0, Math.min(1, (t - a.date) / (b.date - a.date))));
+    };
+    C = { gSel, x, y, W, H, left, right, bottom, tip, narrow, pickPx };
+    // la barra "Elegí un día" ocupa exactamente el ancho del eje de tiempo: el botón queda siempre debajo del punto
+    drawDam();
+    layoutOne();
+    update();
+  }
+
+  // ================= dique (mismo eje vertical que el gráfico) =================
+  function drawDam() {
+    const W = Math.max(260, dbox.clientWidth);
+    // en compu, el dique usa la misma escala vertical que el gráfico: el agua queda a la misma altura que el punto elegido
+    const side = window.matchMedia('(min-width: 860px)').matches && C;
+    const narrow = !side;
+    const off = side ? Math.max(0, dbox.getBoundingClientRect().top - box.getBoundingClientRect().top) : 0;
+    const H = side ? C.H - off : 248;
+    dbox.style.minHeight = H + 'px';
+    dbox.querySelectorAll('svg').forEach((n) => n.remove());
+    const svg = d3.select(dbox).insert('svg', ':first-child').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).style('overflow', 'visible').attr('role', 'img')
+      .attr('aria-label', 'Dique regulador del Río Negro: el Paraná de un lado, el Río Negro del otro');
+    const bottom = side ? H - 44 : H - 62;
+    const y = side ? d3.scaleLinear(yDom, [C.bottom - off, 8 - off]) : d3.scaleLinear(yDom, [bottom, 8]);
+    const damW = narrow ? 14 : 16;
+    const damL = Math.round(W * 0.5 - damW / 2), damR = damL + damW;
+    const defs = svg.append('defs');
+    // cada río con su color (Paraná azul, Río Negro verde agua), con un degradé suave de arriba hacia abajo
+    const vgrad = (id, col, top, bot) => {
+      const g = defs.append('linearGradient').attr('id', id).attr('gradientUnits', 'userSpaceOnUse').attr('x1', 0).attr('x2', 0).attr('y1', 8).attr('y2', bottom);
+      [[0, top], [1, bot]].forEach(([o, a]) => g.append('stop').attr('offset', o).attr('style', `stop-color:${col};stop-opacity:${a}`));
+    };
+    vgrad('rp-grad-pa', dash.colors[0], .44, .2);
+    vgrad('rp-grad-rnv', 'var(--rp-rn)', .55, .3);
+    // con el dique abierto, el Río Negro desagua en el Paraná: su color entra del otro lado y se diluye
+    // (fundido cruzado con máscaras: el verde del Río Negro aparece desde la izquierda del dique y gana del otro lado)
+    const mask = (id, stops) => {
+      const g = defs.append('linearGradient').attr('id', id + '-g').attr('gradientUnits', 'userSpaceOnUse').attr('x1', damL * 0.3).attr('x2', damR + 30).attr('y1', 0).attr('y2', 0);
+      stops.forEach(([o, a]) => g.append('stop').attr('offset', o).attr('stop-color', '#fff').attr('stop-opacity', a));
+      defs.append('mask').attr('id', id).attr('maskUnits', 'userSpaceOnUse').attr('x', 0).attr('y', 0).attr('width', W).attr('height', H)
+        .append('rect').attr('x', 0).attr('y', 0).attr('width', W).attr('height', H).attr('fill', `url(#${id}-g)`);
+    };
+    mask('rp-m-rn', [[0, 0], [.6, .3], [1, 1]]);
+    mask('rp-m-pa', [[0, 1], [.6, .7], [1, 0]]);
+    const gBg = svg.append('g'), gWater = svg.append('g'), gLines = svg.append('g'), gDyn = svg.append('g'), gFlow = svg.append('g'), gPump = svg.append('g'), gGate = svg.append('g');
+    gBg.append('line').attr('x1', 0).attr('x2', W).attr('y1', bottom).attr('y2', bottom).attr('stroke', 'var(--cds-chart-axis)');
+    const { U } = gateRule();
+    U.filter((u) => (u.tipo === 'alerta' || u.tipo === 'evacuacion') && u.altura_m >= yDom[0]).forEach((u) => {
+      const col = u.tipo === 'evacuacion' ? 'var(--color-bad)' : 'var(--color-warn)';
+      gLines.append('line').attr('x1', 0).attr('x2', W).attr('y1', y(u.altura_m)).attr('y2', y(u.altura_m)).attr('stroke', col).attr('stroke-width', 1.5).attr('stroke-dasharray', u.tipo === 'evacuacion' ? null : '6 4');
+    });
+    D = { svg, gWater, gDyn, gFlow, gPump, gGate, y, W, H, bottom, damL, damR, narrow, side: !!side, off, fresh: true, prevOpen: D ? D.prevOpen : undefined };
+  }
+
+  // ================= actualizar todo según el estado =================
+  function update() {
+    if (!C || !D || !series.length) return;
+    if (D.side && Math.abs((dbox.getBoundingClientRect().top - box.getBoundingClientRect().top) - D.off) > 1) drawDam();
+    const sim = S.sim != null;
+    // punto continuo entre días: se mueve píxel a píxel; la fecha que se muestra es la del día más cercano
+    const t = S.t ?? S.idx, i0 = Math.floor(t), i1 = Math.min(series.length - 1, i0 + 1), f = t - i0;
+    const A = series[i0], B = series[i1], lerp = (p, q) => p + (q - p) * f;
+    const near = series[S.idx];
+    const d = { ...near, date: new Date(lerp(+A.date, +B.date)), h: lerp(A.h, B.h),
+      lo: lerp(A.lo ?? A.h, B.lo ?? B.h), hi: lerp(A.hi ?? A.h, B.hi ?? B.h), kind: near.kind };
+    const h = sim ? S.sim : d.h;
+    // compuertas: si el día más cercano es hoy, vale lo que informa la APA; si no, la regla del manual con la altura de ese punto
+    const open = sim ? isOpen(null, h) : near === series.findLast((q) => q.kind === 'obs') ? isOpen(near) : isOpen(null, d.hi);
+    const { U, cierre } = gateRule();
+
+    // --- gráfico de fechas ---
+    const { gSel, x, y, W, left, right, bottom, tip } = C;
+    gSel.selectAll('*').remove();
+    const sx = x(d.date), sy = y(d.h);
+    if (sim) {
+      // simulación: el día queda en pausa (gris) y se marca la altura simulada, sin fecha
+      gSel.append('line').attr('x1', sx).attr('x2', sx).attr('y1', 8).attr('y2', bottom).attr('stroke', 'var(--color-fg)').attr('opacity', .15);
+      gSel.append('circle').attr('cx', sx).attr('cy', sy).attr('r', 4.5).attr('fill', 'var(--color-fg-muted)').attr('opacity', .5);
+      gSel.append('line').attr('x1', left).attr('x2', W - right).attr('y1', y(h)).attr('y2', y(h)).attr('stroke', 'var(--rp-sim)').attr('stroke-width', 1.5).attr('stroke-dasharray', '3 4');
+      gSel.append('text').attr('x', W - right - 4).attr('y', y(h) - 6).attr('text-anchor', 'end').attr('font-size', 11).attr('font-weight', 600).attr('fill', 'var(--rp-sim)').text(`Simulación ${F2(h)} m`);
+      tip.style.opacity = 0;
+    } else {
+      gSel.append('line').attr('x1', sx).attr('x2', sx).attr('y1', 8).attr('y2', bottom).attr('stroke', 'var(--color-fg)').attr('opacity', .45);
+      gSel.append('circle').attr('cx', sx).attr('cy', sy).attr('r', 5.5).attr('fill', dash.colors[0]).attr('stroke', 'var(--color-panel)').attr('stroke-width', 2);
+      tip.replaceChildren();
+      const a = document.createElement('div'); a.className = 'd'; a.textContent = window.rpLong(near.date);
+      const b = document.createElement('div'); b.className = 'v'; b.textContent = d.kind === 'prono' ? `entre ${F2(d.lo)} y ${F2(d.hi)} m` : `${F2(d.h)} m`;
+      tip.append(a, b); tip.style.opacity = 1;
+      const bw = box.clientWidth, scale = bw / C.W, tw = tip.offsetWidth;
+      tip.style.left = Math.max(0, Math.min(bw - tw, sx * scale - tw / 2)) + 'px';
+      tip.style.top = Math.max(0, sy * scale - 58) + 'px';
     }
 
-    // medido
-    const obsS = series.filter((d) => d.kind === 'obs');
-    const grad = svg.append('defs').append('linearGradient').attr('id', 'rp-grad').attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', 1);
-    [[0, .26], [.25, .16], [.5, .08], [.75, .03], [1, 0]].forEach(([o, a]) => grad.append('stop').attr('offset', o).attr('style', `stop-color:${dash.colors[0]};stop-opacity:${a}`));
-    g.append('path').datum(obsS).attr('d', d3.area().x((d) => x(d.date)).y0(H - 28).y1((d) => y(d.h))).attr('fill', 'url(#rp-grad)');
-    g.append('path').datum(obsS).attr('d', d3.line().x((d) => x(d.date)).y((d) => y(d.h)))
-      .attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
+    // --- encabezado del dique ---
+    const when = document.getElementById('dam-when');
+    when.className = 'rp-damwhen' + (sim ? ' sim' : '');
+    const wtxt = window.rpDate.utcFormat('%a %-d de %B')(near.date);
+    when.textContent = sim ? 'Simulación' : ''; when.style.visibility = sim ? 'visible' : 'hidden'; // la fecha ya está en el gráfico de la izquierda
+    setBtn();
+    dia.value = String(sim && S.sim < hEnd() ? 0 : sim ? L.B + Math.max(0, (S.sim - hEnd()) / Math.max(0.01, DAM_TOP - hEnd())) * (1000 - L.B) : (sx - left) / (W - right - left) * L.B);
+    one.classList.toggle('sim', sim);
 
-    const sel = svg.append('g').attr('class', 'rp-sel');
-    const tip = document.createElement('div');
-    tip.className = 'rp-tip';
-    box.appendChild(tip);
-
-    const pick = (event) => {
-      const r = box.getBoundingClientRect();
-      const px = (event.clientX - r.left) * (W / r.width);
-      const dt = x.invert(px);
-      const i = d3.bisector((d) => d.date).center(series, dt);
-      S.idx = Math.max(0, Math.min(series.length - 1, i));
-      slider.value = String(S.idx);
-      drawSelection();
-    };
-    svg.on('pointermove', pick).on('pointerdown', pick);
-
-    lastCtx = { svg, sel, x, y, H, W, tip };
-    document.getElementById('sw-parana').style.color = dash.colors[0];
-    document.getElementById('sw-band').style.background = dash.colors[0];
-    drawSelection();
-    drawSim();
+    drawDamState(h, open, cierre);
+    explain(h, open, U);
   }
 
-  function drawSelection() {
-    if (!lastCtx || !series.length) return;
-    const { sel, x, y, H, W, tip } = lastCtx;
-    const d = series[S.idx];
-    sel.selectAll('*').remove();
-    sel.append('line').attr('x1', x(d.date)).attr('x2', x(d.date)).attr('y1', 10).attr('y2', H - 28).attr('stroke', 'var(--color-fg-muted)').attr('opacity', .5);
-    sel.append('circle').attr('cx', x(d.date)).attr('cy', y(d.h)).attr('r', 5).attr('fill', dash.colors[0]).attr('stroke', 'var(--color-panel)').attr('stroke-width', 2);
-    tip.replaceChildren();
-    const a = document.createElement('div'); a.className = 'd'; a.textContent = window.rpLong(d.date) + (d.kind === 'prono' ? ' · pronóstico' : '');
-    const b = document.createElement('div'); b.className = 'v';
-    b.textContent = d.kind === 'prono' ? `entre ${F2(d.lo)} y ${F2(d.hi)} m` : `${F2(d.h)} m`;
-    tip.append(a, b);
-    tip.style.opacity = 1;
-    const bw = box.clientWidth, scale = bw / W;
-    const tx = x(d.date) * scale, tw = tip.offsetWidth;
-    tip.style.left = Math.max(0, Math.min(bw - tw, tx - tw / 2)) + 'px';
-    tip.style.top = Math.max(0, y(d.h) * scale - 56) + 'px';
-    drawReal(d);
+  function drawDamState(h, open, cierre) {
+    const { gWater, gDyn, gFlow, gPump, gGate, y, W, H, bottom, damL, damR, narrow } = D;
+    const blue = dash.colors[0];
+    gWater.selectAll('*').remove(); gDyn.selectAll('*').remove();
+    const sy = y(h);
+    d3.select(dbox).select('#rp-grad-pa').attr('y1', sy); // el degradé arranca en la superficie del agua
+    d3.select(dbox).select('#rp-grad-rnv').attr('y1', y(open ? h : Math.min(h, cierre)));
+    const rnH = open ? h : Math.min(h, cierre);
+    const ry = y(rnH);
+    // agua: abierta = una sola forma que pasa por debajo del dique; cerrada = cada río por su lado
+    const wEnd = open ? W : damL;
+    const pEnd = open ? damR : damL;
+    if (open) {
+      // dique abierto: una sola agua; el Río Negro (verde) desagua en el Paraná (azul) y los colores se funden
+      gWater.append('rect').attr('x', 0).attr('y', sy).attr('width', W).attr('height', bottom - sy).attr('fill', 'var(--color-panel)');
+      gWater.append('rect').attr('x', 0).attr('y', sy).attr('width', W).attr('height', bottom - sy).attr('fill', 'url(#rp-grad-pa)').attr('mask', 'url(#rp-m-pa)');
+      gWater.append('rect').attr('x', 0).attr('y', sy).attr('width', W).attr('height', bottom - sy).attr('fill', 'url(#rp-grad-rnv)').attr('mask', 'url(#rp-m-rn)');
+    } else {
+      // dique cerrado: cada río por su lado, con su color
+      gWater.append('rect').attr('x', 0).attr('y', sy).attr('width', damL).attr('height', bottom - sy).attr('fill', 'var(--color-panel)');
+      gWater.append('rect').attr('x', 0).attr('y', sy).attr('width', damL).attr('height', bottom - sy).attr('fill', 'url(#rp-grad-pa)');
+      gWater.append('rect').attr('x', damR).attr('y', ry).attr('width', W - damR).attr('height', bottom - ry).attr('fill', 'var(--color-panel)');
+      gWater.append('rect').attr('x', damR).attr('y', ry).attr('width', W - damR).attr('height', bottom - ry).attr('fill', 'url(#rp-grad-rnv)');
+    }
+    gWater.append('line').attr('x1', 0).attr('x2', pEnd).attr('y1', sy).attr('y2', sy).attr('stroke', blue).attr('stroke-width', 1.5).attr('opacity', .7);
+    gWater.append('line').attr('x1', damR).attr('x2', W).attr('y1', ry).attr('y2', ry).attr('stroke', 'var(--rp-rn)').attr('stroke-width', 1.5).attr('opacity', .8);
+    const lab = (g, t, xx, yy, anchor, bold, col, size) => g.append('text').attr('x', xx).attr('y', yy).attr('text-anchor', anchor).attr('font-size', size || 11).attr('font-weight', bold ? 600 : 400).attr('fill', col || 'var(--color-fg)').text(t);
+    // los dos nombres a la misma distancia del dique (más allá de la manguera de la bomba), y nunca encima de la flecha de corriente
+    const gd = narrow ? 34 : 40, arrowY = bottom - Math.round(Math.min(narrow ? 46 : 72, (bottom - y(DAM_TOP)) * 0.3)) / 2;
+    const ly = (top) => (top + 20 <= arrowY - 12 ? top + 20 : top - 6);
+    lab(gDyn, 'Río Paraná', damL - gd, ly(sy), 'end', true);
+    lab(gDyn, 'Río Negro', damR + gd, ly(ry), 'start', true);
+    // dique y compuerta (la compuerta baja con animación cuando se cierra)
+    const damTop = y(DAM_TOP);
+    const gapH = Math.round(Math.min(narrow ? 46 : 72, (bottom - damTop) * 0.3));
+    // el dique es una sola pared: abierto deja un hueco abajo; al cerrarse, la pared baja hasta el fondo (con animación)
+    gGate.selectAll('rect.rp-gate').remove();
+    const wall = gGate.selectAll('rect.rp-damwall').data([0]).join('rect').attr('class', 'rp-damwall')
+      .attr('x', damL).attr('y', damTop).attr('width', damR - damL).attr('rx', 2).attr('fill', 'var(--color-fg-muted)');
+    const wallH = open ? bottom - damTop - gapH : bottom - damTop;
+    const changed = D.prevOpen !== undefined && D.prevOpen !== open && !still();
+    if (D.prevOpen === undefined || still() || D.fresh) wall.interrupt().attr('height', wallH);
+    else if (changed) wall.interrupt().transition().duration(open ? 900 : 1200).ease(open ? d3.easeCubicInOut : d3.easeBounceOut).attr('height', wallH);
+    lab(gDyn, 'Dique', (damL + damR) / 2, damTop - 6, 'middle', true, null, narrow ? 11 : 12);
+    gFlow.selectAll('*').remove(); gPump.selectAll('*').remove();
+    if (D.prevOpen === undefined || still() || D.fresh) { gFlow.interrupt().attr('opacity', open ? 1 : 0); gPump.interrupt().attr('opacity', open ? 0 : 1); }
+    else if (changed && !open) { gFlow.interrupt().transition().duration(250).attr('opacity', 0); gPump.interrupt().attr('opacity', 0).transition().delay(650).duration(700).attr('opacity', 1); }
+    else if (changed && open) { gPump.interrupt().transition().duration(350).attr('opacity', 0); gFlow.interrupt().attr('opacity', 0).transition().delay(550).duration(500).attr('opacity', 1); }
+    D.prevOpen = open; D.fresh = false;
+    gDyn.append('line').attr('x1', 0).attr('x2', W).attr('y1', damTop).attr('y2', damTop).attr('stroke', 'var(--color-fg-muted)').attr('stroke-width', 1.2).attr('stroke-dasharray', '2 3');
+    lab(gDyn, narrow ? 'tope 9,5 m' : 'tope del dique 9,5 m', W - 2, damTop - 5, 'end', false, 'var(--color-fg-muted)', 10);
+    // abierta: el Río Negro desagota al Paraná por debajo
+    const ay = bottom - gapH / 2;
+    gFlow.append('path').attr('d', `M${damR + 14},${ay} L${damL - 8},${ay}`).attr('stroke', 'var(--rp-rn)').attr('stroke-width', 2.5).attr('stroke-dasharray', '6 6').attr('class', 'rp-flow');
+    gFlow.append('path').attr('d', `M${damL - 4},${ay - 5} L${damL - 10},${ay} L${damL - 4},${ay + 5}`).attr('fill', 'none').attr('stroke', 'var(--rp-rn)').attr('stroke-width', 2);
+    // cerrada: la bomba saca el agua del Río Negro por arriba del dique
+    const px = damR + (narrow ? 20 : 24), pipeTop = damTop - 26;
+    const endX = damL - (narrow ? 18 : 26), endY = pipeTop + (narrow ? 18 : 30);
+    const pr = narrow ? 11 : 15, pcy = bottom - (narrow ? 26 : 66), pumpY = pcy - pr;
+    const pipe = `M${px},${pumpY} V${pipeTop} H${endX} V${endY}`;
+    gPump.append('path').attr('d', pipe).attr('fill', 'none').attr('stroke', 'var(--color-fg)').attr('stroke-width', 9).attr('stroke-linejoin', 'round');
+    gPump.append('path').attr('d', pipe).attr('fill', 'none').attr('stroke', 'var(--color-panel)').attr('stroke-width', 5.5).attr('stroke-linejoin', 'round');
+    gPump.append('path').attr('d', pipe).attr('fill', 'none').attr('stroke', blue).attr('stroke-width', 3.5).attr('stroke-dasharray', '7 5').attr('stroke-linejoin', 'round').attr('class', 'rp-flow');
+    // boca de la bomba: un caño corto igual que la manguera (dos líneas), que toma agua del Río Negro
+    const inX = px + pr + pr * 1.3;
+    const intake = `M${inX},${pcy} H${px}`;
+    gPump.append('path').attr('d', intake).attr('fill', 'none').attr('stroke', 'var(--color-fg)').attr('stroke-width', 9);
+    gPump.append('path').attr('d', intake).attr('fill', 'none').attr('stroke', 'var(--color-panel)').attr('stroke-width', 5.5);
+    gPump.append('path').attr('d', intake).attr('fill', 'none').attr('stroke', blue).attr('stroke-width', 3.5).attr('stroke-dasharray', '7 5').attr('class', 'rp-flow');
+    gPump.append('circle').attr('cx', px).attr('cy', pcy).attr('r', pr).attr('fill', 'var(--color-fg)');
+    const rot = gPump.append('g').attr('transform', `translate(${px},${pcy})`).append('g').attr('class', 'rp-spin');
+    [0, 120, 240].forEach((a) => rot.append('path').attr('d', `M0,0 L${pr * 0.62},${-pr * 0.18}`).attr('transform', `rotate(${a})`).attr('stroke', 'var(--color-panel)').attr('stroke-width', 2.5).attr('stroke-linecap', 'round'));
+    rot.append('circle').attr('r', 2.5).attr('fill', 'var(--color-panel)');
+    lab(gPump, 'bomba', inX + 8, pcy + 4, 'start', true, null, narrow ? 10 : 11);
+    for (let k = -1; k <= 1; k++) {
+      gPump.append('line').attr('x1', endX + k * 3).attr('y1', endY + 4).attr('x2', endX + k * 6).attr('y2', Math.max(endY + 8, sy - 2))
+        .attr('stroke', blue).attr('stroke-width', 2.5).attr('stroke-linecap', 'round').attr('stroke-dasharray', '3 4').attr('class', 'rp-flow');
+    }
+    // la superficie del Río Negro (6 m) es la que sube si llueve mucho
+    const ax = W - 14, aTop = Math.max(pipeTop + 34, ry - 30);
+    gPump.append('path').attr('d', `M${ax},${ry - 3} V${aTop} M${ax - 5},${aTop + 7} L${ax},${aTop} L${ax + 5},${aTop + 7}`).attr('fill', 'none').attr('stroke', 'var(--color-warn)').attr('stroke-width', 2).attr('stroke-linecap', 'round');
+    lab(gPump, 'si llueve mucho, sube', ax + 6, aTop - 8, 'end', true, 'var(--color-warn)', 10);
+    // manija para simular: sobre la superficie del Paraná
+    const rb = dbox.getBoundingClientRect(), sc = rb.width / W;
+    handle.style.left = (damL * 0.3 * sc) + 'px';
+    handle.style.top = (sy * sc) + 'px';
+    document.getElementById('dam-handle-v').textContent = `${F2(h)} m`;
+    // debajo del dique: su estado y qué pasa con la lluvia (los dos textos son de este gráfico)
+    const cap = document.getElementById('dam-cap');
+    cap.style.top = ((bottom + 8) * sc) + 'px';
+    cap.className = 'rp-damcap' + (open ? '' : ' closed');
+    cap.innerHTML = open
+      ? '<b>Dique abierto.</b> Con las compuertas abiertas, la lluvia tiene salida al Paraná.'
+      : '<b>Dique cerrado.</b> Con las compuertas cerradas, la lluvia es lo que más sube el Río Negro: los días marcados abajo son los de mayor riesgo.';
   }
 
-  function gateRule() {
-    const U = umbrales();
-    return { U, cierre: (U.find((u) => u.tipo === 'alerta') || {}).altura_m };
+  // ================= tarjeta: qué pasa a esta altura + lluvia =================
+  // solo de hoy en adelante (hora de Argentina): si una actualización se atrasa, no se muestran días que ya pasaron
+  function rainRows() {
+    const ll = dash.data('lluvia'); if (ll.status !== 'ok') return [];
+    const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
+    const fut = ll.data.filter((r) => String(r.fecha).slice(0, 10) >= hoy);
+    return (fut.length ? fut : ll.data).slice(0, 4);
   }
-
-  function drawReal(d) {
-    const st = dash.data('situacion');
-    const sit = st.status === 'ok' && st.data[0] ? st.data[0] : null;
-    const { U, cierre } = gateRule();
-    const isLatest = d.kind === 'obs' && S.idx === series.findLastIndex((q) => q.kind === 'obs');
-    const byRule = !(cierre && (d.hi ?? d.h) > cierre);
-    const apa = isLatest && sit ? String(sit.compuertas_rio_negro || '') : '';
-    let open, label;
-    if (/abiert/i.test(apa)) { open = true; label = 'compuertas abiertas · dato APA'; }
-    else if (/cerrad/i.test(apa)) { open = false; label = 'compuertas cerradas · dato APA'; }
-    else if (isLatest) { open = byRule; label = open ? 'compuertas abiertas · sin confirmar' : 'se cerrarían · sin confirmar APA'; }
-    else { open = byRule; label = d.kind === 'prono' ? (open ? 'seguirían abiertas · según manual' : 'se cerrarían · según manual') : (open ? 'abiertas · según manual' : 'cerradas · según manual'); }
-    document.getElementById('xs-date').textContent = `${window.rpDate.utcFormat('%a %-d %b')(d.date)} · Paraná en ${d.kind === 'prono' ? F2(d.lo) + ' a ' + F2(d.hi) : F2(d.h)} m${d.kind === 'prono' ? ' (pronóstico)' : ''}`;
-    diagram(xs, d, open, U, label);
-  }
-
-  function drawSim() {
-    const h = Number(simIn.value);
-    const { U, cierre } = gateRule();
-    const open = !(cierre && h > cierre);
-    document.getElementById('sim-val').textContent = F2(h);
-    diagram(xsSim, { h, kind: 'sim' }, open, U, open ? 'compuertas abiertas' : 'compuertas cerradas');
-
+  // lluvia: con las compuertas abiertas queda atenuada; cuando se cierran pasa a primer plano
+  function drawRain(open) {
     const rain = document.getElementById('lluvia'), rdays = document.getElementById('rain-days');
-    const ll = dash.data('lluvia');
-    rdays.replaceChildren();
-    const lrows = ll.status === 'ok' ? ll.data.map((r) => ({ ...r, nivel: Number(r.nivel) })) : [];
-    lrows.forEach((r) => {
-      const c = document.createElement('div'); c.className = 'rp-rday n' + r.nivel;
-      const dd = document.createElement('div'); dd.className = 'dd'; dd.textContent = window.rpDate.utcFormat('%a %-d')(window.rpParse(r.fecha));
-      const ic = rainIcon(r.nivel);
-      const dl = document.createElement('div'); dl.className = 'dl';
-      dl.textContent = r.nivel >= 2 ? 'Lluvia y tormentas' : r.nivel === 1 ? 'Lluvia posible' : 'Sin lluvia';
-      const txt = document.createElement('div'); txt.className = 'dtx';
-      const dt = document.createElement('div'); dt.className = 'dt'; dt.textContent = r.descripcion;
-      txt.append(dl, dt);
-      const amt = document.createElement('div'); amt.className = 'damt';
-      if (r.mm) { const dm = document.createElement('div'); dm.className = 'dm'; dm.textContent = String(r.mm) + ' (SMN)'; amt.append(dm); }
-      if (r.mm_modelo != null && r.mm_modelo !== '') {
-        const mv = Number(r.mm_modelo), pv = r.prob_modelo == null || r.prob_modelo === '' ? null : Number(r.prob_modelo);
-        const n = document.createElement('div'); n.className = 'mmv'; n.textContent = window.rpLocale.format('.1~f')(mv) + ' mm';
-        const p = document.createElement('div'); p.className = 'dmo'; p.textContent = pv != null ? pv + '%' : '';
-        amt.append(n, p);
-      }
-      c.append(dd, ic, txt, amt); rdays.appendChild(c);
-    });
+    const rows = rainRows().map((r) => ({ ...r, nivel: Number(r.nivel) }));
+    if (rdays.dataset.n !== String(rows.length)) {
+      rdays.dataset.n = String(rows.length);
+      rdays.replaceChildren();
+      rows.forEach((r) => {
+        const c = document.createElement('div'); c.className = 'rp-rday n' + r.nivel;
+        const dd = document.createElement('div'); dd.className = 'dd'; dd.textContent = window.rpDate.utcFormat('%a %-d')(window.rpParse(r.fecha));
+        const dl = document.createElement('div'); dl.className = 'dl'; dl.textContent = r.nivel >= 2 ? 'Lluvia y tormentas' : r.nivel === 1 ? 'Lluvia posible' : 'Sin lluvia';
+        const txt = document.createElement('div'); txt.className = 'dtx';
+        const dt = document.createElement('div'); dt.className = 'dt'; dt.textContent = r.descripcion || '';
+        txt.append(dl, dt);
+        const amt = document.createElement('div'); amt.className = 'damt';
+        if (r.mm) { const dm = document.createElement('div'); dm.className = 'dm'; dm.textContent = String(r.mm) + ' (SMN)'; amt.append(dm); }
+        if (r.mm_modelo != null && r.mm_modelo !== '') {
+          const pv = r.prob_modelo == null || r.prob_modelo === '' ? null : Number(r.prob_modelo);
+          const n = document.createElement('div'); n.className = 'mmv'; n.textContent = window.rpLocale.format('.1~f')(Number(r.mm_modelo)) + ' mm';
+          const p = document.createElement('div'); p.className = 'dmo'; p.textContent = pv != null ? pv + '%' : '';
+          amt.append(n, p);
+        }
+        c.append(dd, rainIcon(r.nivel), txt, amt); rdays.appendChild(c);
+      });
+    }
     rain.classList.toggle('on', !open);
     rain.classList.toggle('dim', open);
-    document.getElementById('rain-note').textContent = open
-      ? 'Con las compuertas abiertas, la lluvia tiene salida al Paraná.'
-      : 'Con las compuertas cerradas, esta lluvia es lo que más sube el Río Negro: los días marcados son los de mayor riesgo.';
-
-    const hit = U.filter((u) => h >= u.altura_m).sort((a, b) => b.altura_m - a.altura_m);
-    const comp = open
-      ? 'Las compuertas seguirían abiertas: el Río Negro sube junto con el Paraná.'
-      : 'Las compuertas estarían cerradas y el agua del Río Negro se saca con bombas. Es el momento de más riesgo: si llueve mucho y las bombas no dan abasto, el Río Negro sube.';
-    const so = document.getElementById('sim-out');
-    const top = hit[0] ? hit[0].tipo : '';
-    so.className = 'rp-simout' + (top === 'evacuacion' ? ' lv-evac' : top === 'alerta' ? ' lv-alerta' : '');
-    const lead = document.createElement('b');
-    lead.textContent = hit.length ? `A ${F2(h)} m: ${hit[0].nombre}.` : `A ${F2(h)} m no se alcanza ningún nivel de aviso.`;
-    const live = document.createElement('span'); live.className = 'live';
-    live.append(lead, document.createTextNode(' ' + comp));
-    const closedTxt = 'Las compuertas estarían cerradas y el agua del Río Negro se saca con bombas. Es el momento de más riesgo: si llueve mucho y las bombas no dan abasto, el Río Negro sube.';
-    const longest = U.map((u) => `A 8,88 m: ${u.nombre}. ${closedTxt}`).concat([`A 8,88 m no se alcanza ningún nivel de aviso. ${closedTxt}`]).sort((a, b) => b.length - a.length)[0];
-    const ghost = document.createElement('span'); ghost.className = 'ghost'; ghost.setAttribute('aria-hidden', 'true');
-    const gb = document.createElement('b'); gb.textContent = longest; ghost.append(gb);
-    so.replaceChildren(ghost, live);
   }
 
   function rainIcon(n) {
@@ -614,65 +1038,40 @@ window.rpState = { range: 30, idx: null };
     return s;
   }
 
-  function diagram(el, d, open, U, label) {
-    const sim = d.kind === 'sim';
-    const W = Math.max(260, el.clientWidth), H = 200;
-    el.replaceChildren();
-    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
-      .attr('aria-label', sim ? 'Simulación del dique del Río Negro' : 'Esquema del dique del Río Negro con la altura del Paraná del día elegido');
-    const y = d3.scaleLinear([0, 10], [H - 18, 22]);
-    const damTop = y(9.5);
-    const damL = W * 0.42, damR = damL + 18;
-    const bottom = H - 18;
-    const water = Math.max(0, d.h);
-    const wy = y(water);
-    const blue = dash.colors[0], blue2 = dash.colors[1] || dash.colors[0];
-    svg.append('rect').attr('x', 0).attr('y', bottom).attr('width', W).attr('height', 18).attr('fill', 'var(--cds-chart-grid)');
-    svg.append('rect').attr('x', 0).attr('y', wy).attr('width', damL).attr('height', bottom - wy).attr('fill', blue).attr('opacity', .45);
-    const rnH = open ? water : Math.min(water, 4);
-    const ry = y(rnH);
-    svg.append('rect').attr('x', damR).attr('y', ry).attr('width', W - damR).attr('height', bottom - ry).attr('fill', blue2).attr('opacity', .35);
-    U.filter((u) => u.tipo === 'alerta' || u.tipo === 'evacuacion').forEach((u) => {
-      const col = u.tipo === 'evacuacion' ? 'var(--color-bad)' : 'var(--color-warn)';
-      svg.append('line').attr('x1', 0).attr('x2', damL).attr('y1', y(u.altura_m)).attr('y2', y(u.altura_m)).attr('stroke', col).attr('stroke-dasharray', u.tipo === 'alerta' ? '6 4' : null);
-      svg.append('text').attr('x', 4).attr('y', u.tipo === 'alerta' ? y(u.altura_m) + 11 : y(u.altura_m) - 4).attr('font-size', 10).attr('fill', col).text(`${String(u.nombre).split(' · ')[0]} ${window.rpLocale.format('.1~f')(u.altura_m)} m`);
-    });
-    svg.append('rect').attr('x', damL).attr('y', damTop).attr('width', damR - damL).attr('height', bottom - damTop - (open ? 26 : 0)).attr('fill', 'var(--color-fg-muted)').attr('rx', 2);
-    if (open) {
-      svg.append('path').attr('d', `M${damL - 6},${bottom - 13} L${damR + 6},${bottom - 13}`).attr('stroke', blue).attr('stroke-width', 2);
-      svg.append('path').attr('d', `M${damL + 2},${bottom - 18} L${damL - 4},${bottom - 13} L${damL + 2},${bottom - 8}`).attr('fill', 'none').attr('stroke', blue).attr('stroke-width', 2);
-    } else {
-      // bomba y caño: saca agua del Río Negro y la tira al Paraná
-      const px = damR + 26, top = 6;
-      const endX = Math.max(24, damL - 46), endY = Math.max(top + 18, wy - 18);
-      const pipe = `M${px},${bottom - 10} V${top} H${endX} V${endY}`;
-      svg.append('path').attr('d', pipe).attr('fill', 'none').attr('stroke', 'var(--color-fg-muted)').attr('stroke-width', 7).attr('stroke-linejoin', 'round');
-      svg.append('path').attr('d', pipe).attr('fill', 'none').attr('stroke', blue2).attr('stroke-width', 3).attr('stroke-dasharray', '6 6').attr('class', 'rp-flow');
-      svg.append('rect').attr('x', px - 20).attr('y', bottom - 30).attr('width', 40).attr('height', 20).attr('rx', 4).attr('fill', 'var(--color-fg-muted)');
-      svg.append('text').attr('x', px).attr('y', bottom - 16).attr('text-anchor', 'middle').attr('font-size', 9).attr('font-weight', 600).attr('fill', 'var(--color-panel)').text('bomba');
-      // chorro que cae al Paraná
-      for (let k = -1; k <= 1; k++) {
-        svg.append('line').attr('x1', endX + k * 3).attr('y1', endY + 4).attr('x2', endX + k * 6).attr('y2', Math.max(endY + 8, wy - 2))
-          .attr('stroke', blue).attr('stroke-width', 2).attr('stroke-linecap', 'round').attr('stroke-dasharray', '3 4').attr('class', 'rp-flow');
-      }
-      // riesgo por lluvia: el Río Negro puede subir
-      const rx0 = damR + 8, rx1 = W - 4, riskY = Math.max(top + 28, ry - 30);
-      svg.append('line').attr('x1', rx0).attr('x2', rx1).attr('y1', riskY).attr('y2', riskY).attr('stroke', 'var(--color-warn)').attr('stroke-dasharray', '4 4');
-      svg.append('path').attr('d', `M${W - 22},${ry - 4} V${riskY + 6} M${W - 27},${riskY + 11} L${W - 22},${riskY + 4} L${W - 17},${riskY + 11}`)
-        .attr('fill', 'none').attr('stroke', 'var(--color-warn)').attr('stroke-width', 2).attr('stroke-linecap', 'round');
-      svg.append('text').attr('x', rx1 - 14).attr('y', riskY - 5).attr('text-anchor', 'end').attr('font-size', 10).attr('font-weight', 600).attr('fill', 'var(--color-warn)').text('con mucha lluvia, sube');
-    }
-    const lab = (t, xx, yy, anchor, bold) => svg.append('text').attr('x', xx).attr('y', yy).attr('text-anchor', anchor).attr('font-size', 11).attr('font-weight', bold ? 600 : 400).attr('fill', 'var(--color-fg)').text(t);
-    lab('Río Paraná', damL / 2, Math.min(bottom - 20, wy + 34), 'middle', true);
-    lab(`${d.kind === 'prono' ? '≈' : ''}${F2(water)} m`, damL / 2, Math.min(bottom - 6, wy + 48), 'middle', false);
-    lab('Río Negro', damR + (W - damR) / 2, Math.min(bottom - 6, ry + 16), 'middle', true);
-    lab('(Resistencia)', damR + (W - damR) / 2, Math.min(bottom - 6, ry + 30), 'middle', false);
-    svg.append('line').attr('x1', 0).attr('x2', damL).attr('y1', damTop).attr('y2', damTop).attr('stroke', 'var(--color-fg-muted)').attr('stroke-dasharray', '2 3');
-    svg.append('text').attr('x', 4).attr('y', damTop - 4).attr('font-size', 10).attr('fill', 'var(--color-fg-muted)').text('tope 9,5 m');
-    if (open) svg.append('text').attr('x', (damL + damR) / 2).attr('y', damTop - 6).attr('text-anchor', 'middle').attr('font-size', 11).attr('font-weight', 600).attr('fill', 'var(--color-fg)').text('Dique');
-    else svg.append('text').attr('x', damL - 4).attr('y', 34).attr('text-anchor', 'end').attr('font-size', 11).attr('font-weight', 600).attr('fill', 'var(--color-fg)').text('Dique');
-    svg.append('text').attr('x', (damL + damR) / 2).attr('y', bottom + 13).attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', open ? 'var(--color-ok)' : 'var(--color-warn)')
-      .text(label);
+  // mensaje: la altura grande y aparte (con ancho fijo, para que el texto no se mueva al arrastrar), el nivel al lado y abajo qué pasa
+  function message(h, open, U) {
+    const hit = U.filter((u) => h >= u.altura_m).sort((a, b) => b.altura_m - a.altura_m);
+    const top = hit[0];
+    if (h >= DAM_TOP - 0.005) return ['Tope del dique', 'El Paraná llega al tope del dique y de las defensas de la ciudad.'];
+    if (!top) return ['Sin aviso', `Las compuertas del Río Negro están ${open ? 'abiertas' : 'cerradas'}.`];
+    if (top.tipo === 'evacuacion') return ['Evacuación', open ? 'El Paraná llega al nivel de evacuación.' : 'Las compuertas siguen cerradas y, si llueve mucho y las bombas no dan abasto, el Río Negro sube.'];
+    if (top.tipo === 'alerta') return ['Alerta', open ? 'Por protocolo, la APA puede cerrar las compuertas del Río Negro.' : 'Por protocolo, la APA cierra las compuertas del Río Negro, y es el momento de más riesgo porque, si llueve mucho y las bombas no dan abasto, el río sube.'];
+    const n = /^extremar/i.test(top.nombre) ? 'Hay que ' + top.nombre.charAt(0).toLowerCase() + top.nombre.slice(1) : top.nombre;
+    return ['Aviso', `${n}, y las compuertas siguen ${open ? 'abiertas' : 'cerradas'}.`];
+  }
+  const msgNode = (hTxt, lvl, desc) => {
+    const w = document.createElement('span'); w.className = 'live';
+    const hd = document.createElement('span'); hd.className = 'mh';
+    const nu = document.createElement('span'); nu.className = 'mnum'; nu.append(hTxt, Object.assign(document.createElement('small'), { textContent: 'metros' }));
+    const lv = document.createElement('span'); lv.className = 'mlvl'; lv.textContent = lvl;
+    hd.append(nu, lv);
+    const de = document.createElement('span'); de.className = 'mdesc'; de.textContent = desc;
+    w.append(hd, de); return w;
+  };
+  function explain(h, open, U) {
+    const hit = U.filter((u) => h >= u.altura_m).sort((a, b) => b.altura_m - a.altura_m);
+    const so = document.getElementById('sim-out');
+    const top = hit[0] ? hit[0].tipo : '';
+    so.className = 'rp-simout' + (top === 'evacuacion' ? ' lv-evac' : top === 'alerta' ? ' lv-alerta' : '');
+    const [lvl, desc] = message(h, open, U);
+    const live = msgNode(F2(h), lvl, desc);
+    // reserva el alto del mensaje más largo para que la tarjeta no salte
+    const cands = [];
+    U.map((u) => u.altura_m + 0.01).concat([2.6, DAM_TOP]).forEach((hh) => [true, false].forEach((o) => cands.push(message(hh, o, U)[1])));
+    const ghost = msgNode('8,88', 'Evacuación', cands.sort((a, b) => b.length - a.length)[0]);
+    ghost.className = 'ghost'; ghost.setAttribute('aria-hidden', 'true');
+    so.replaceChildren(ghost, live);
+    drawRain(open);
   }
 
   function failed(el) {
@@ -694,16 +1093,15 @@ window.rpState = { range: 30, idx: null };
   dash.onData(() => {
     const r = dash.data('resumen'), u = dash.data('umbrales');
     const take = document.getElementById('takeaway');
-    const dDia = document.getElementById('delta-dia'), ritmo = document.getElementById('ritmo'), est = document.getElementById('estimacion');
+    const dDia = document.getElementById('delta-dia'), ritmo = document.getElementById('ritmo');
     const ok = r.status === 'ok' && r.data && r.data[0];
     document.querySelectorAll('[data-source="resumen"]').forEach((el) => el.classList.toggle('dash-skeleton', !ok && r.status === 'loading'));
-    if (!ok) { dDia.textContent = ''; ritmo.textContent = ''; est.textContent = ''; return; }
+    if (!ok) { dDia.textContent = ''; ritmo.textContent = ''; return; }
     const s = r.data[0];
     document.querySelector('[data-source="resumen"][data-field="altura_m"]').textContent = F2(s.altura_m);
     document.querySelector('[data-source="resumen"][data-field="falta_alerta_m"]').textContent = F2(s.falta_alerta_m);
     const fecha = window.rpLong(window.rpParse(s.fecha));
-    dDia.textContent = `${s.cambio_dia_cm >= 0 ? '▲' : '▼'} ${window.rpFmtCm(s.cambio_dia_cm)} cm desde el día anterior`;
-    document.getElementById('hoy-fecha').textContent = window.rpDate.utcFormat('%A %-d de %B')(window.rpParse(s.fecha)) + (s.hora && /^\d{1,2}:\d{2}$/.test(s.hora) ? ', ' + s.hora + ' h' : '');
+    dDia.textContent = `${s.cambio_dia_cm >= 0 ? '▲' : '▼'} ${window.rpFmtCm(s.cambio_dia_cm)} cm desde ayer`;
     dDia.className = 'rp-delta ' + (s.cambio_dia_cm > 0 ? 'rp-up' : s.cambio_dia_cm < 0 ? 'rp-down' : '');
     ritmo.textContent = s.ritmo_cm_dia > 0
       ? `Viene subiendo ~${s.ritmo_cm_dia} cm por día (últimos 7 días)`
@@ -716,10 +1114,6 @@ window.rpState = { range: 30, idx: null };
     const b2 = document.createElement('b'); b2.textContent = `${F2(s.falta_alerta_m)} m`;
     take.append('Hoy el Paraná está en ', b1, ` en Barranqueras ${dir}. Faltan `, b2, ' para el nivel de alerta.');
     }
-    if (s.dias_a_alerta) {
-      const llegada = d3.utcDay.offset(window.rpParse(s.fecha), s.dias_a_alerta);
-      est.textContent = `Cuenta simple, no oficial: si sigue subiendo como en la última semana, llegaría a la alerta en unos ${s.dias_a_alerta} días (cerca del ${window.rpLong(llegada)}).`;
-    } else est.textContent = '';
 
     // escalera de niveles
     const ul = document.getElementById('ladder');
@@ -751,7 +1145,6 @@ window.rpState = { range: 30, idx: null };
 
   dash.onData(() => {
     const st = dash.data('situacion');
-    const pill = document.getElementById('alerta-pill');
     const marks = document.querySelectorAll('[data-source="situacion"][data-field]');
     marks.forEach((el) => el.classList.toggle('dash-skeleton', st.status === 'loading'));
     if (st.status !== 'ok' || !st.data[0]) { marks.forEach((el) => { el.textContent = '—'; }); return; }
@@ -767,9 +1160,17 @@ window.rpState = { range: 30, idx: null };
       fr.classList.toggle('old', (Date.now() - up.getTime()) > 30 * 3600 * 1000);
     } else ft.textContent = String(st.data[0].fecha || '—');
     const a = String(st.data[0].alerta_apa || '').toLowerCase();
-    pill.className = 'rp-pill';
-    const sa = document.getElementById('src-apa');
-    if (sa && st.data[0].fuente_url && /^https:\/\//.test(String(st.data[0].fuente_url))) sa.href = String(st.data[0].fuente_url);
+    // la fuente de las compuertas dice exactamente de dónde salió el dato: quién lo informó y dónde se publicó
+    const fu = String(st.data[0].fuente_url || '');
+    if (/^https:\/\//.test(fu)) {
+      const host = fu.replace(/^https:\/\/(www\.)?/, '').split('/')[0];
+      const MEDIOS = { 'diariolavozdelchaco.com': 'La Voz del Chaco', 'diarionorte.com': 'Diario Norte', 'datachaco.com': 'Data Chaco', 'chacodiapordia.com': 'Chaco Día por Día', 'diariochaco.com': 'Diario Chaco', 'facebook.com': 'Facebook de la APA', 'x.com': 'X de la APA', 'chaco.gob.ar': 'Gobierno del Chaco', 'chaco.gov.ar': 'Gobierno del Chaco', 'comunicacion.chaco.gob.ar': 'Gobierno del Chaco' };
+      const medio = st.data[0].fuente_medio || MEDIOS[host] || host;
+      const m = fu.match(/\/(20\d\d)\/(\d\d)\/(\d\d)\//);
+      const f = st.data[0].fuente_fecha || (m ? `${m[1]}-${m[2]}-${m[3]}` : '');
+      const txt = `APA Chaco, vía ${medio}` + (f ? ` (${window.rpShort(window.rpParse(f))})` : '');
+      document.querySelectorAll('.src-apa').forEach((a) => { a.href = fu; a.textContent = txt; });
+    }
     const gt = document.getElementById('gate-tile');
     const g = String(st.data[0].compuertas_rio_negro || '');
     gt.className = 'rp-big rp-gate ' + (/abiert/i.test(g) ? 'open' : /cerrad/i.test(g) ? 'closed' : '');
@@ -814,12 +1215,12 @@ window.rpState = { range: 30, idx: null };
     el.replaceChildren();
     if (h.status !== 'ok' || r.status !== 'ok' || !r.data[0]) return;
     const hoy = Number(r.data[0].altura_m);
-    const marks = h.data.map((d) => ({ label: d.evento, v: Number(d.altura_m), kind: d.tipo === 'defensa' ? 'defensa' : 'hist' }));
+    const marks = h.data.filter((d) => d.tipo === 'defensa' || String(d.evento) === '1983').map((d) => ({ label: d.evento, v: Number(d.altura_m), kind: d.tipo === 'defensa' ? 'defensa' : 'hist' }));
     (u.status === 'ok' ? u.data : []).filter((d) => d.tipo === 'alerta' || d.tipo === 'evacuacion')
       .forEach((d) => marks.push({ label: d.tipo === 'alerta' ? 'Alerta' : 'Evacuación', v: Number(d.altura_m), kind: d.tipo }));
     const W = Math.max(220, el.clientWidth), H = 190, x0 = 40, top = 8, bot = H - 8;
     const y = d3.scaleLinear([0, 10], [bot, top]);
-    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Altura de hoy comparada con crecidas históricas');
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).style('overflow', 'visible').attr('role', 'img').attr('aria-label', 'Altura de hoy comparada con crecidas históricas');
     // regla
     const rw = 24;
     svg.append('rect').attr('x', x0).attr('y', top).attr('width', rw).attr('height', bot - top).attr('rx', 4).attr('fill', 'var(--color-bg)').attr('stroke', 'var(--color-border-line)');
@@ -847,7 +1248,7 @@ window.rpState = { range: 30, idx: null };
       el.replaceChildren();
       const W = Math.max(260, el.clientWidth), H = 190, bottom = H - 16;
       const ys = d3.scaleLinear([0, 10], [bottom, 8]);
-      const sv = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
+      const sv = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).style('overflow', 'visible').attr('role', 'img')
         .attr('aria-label', broken ? 'Dique roto en 1982, el agua inunda los barrios' : 'Dique reconstruido hoy, los barrios están secos');
       const damL = W * 0.38, damR = damL + 16, ground = ys(6.2);
       const blue = dash.colors[0], wy = ys(hv);
