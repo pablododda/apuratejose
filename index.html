@@ -256,8 +256,8 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
   .rp-tiles > .rp-card { background: transparent; border: 0; border-radius: 0; padding: 12px 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: center; }
   .rp-tiles > .rp-card + .rp-card { border-top: 1px solid var(--color-border-line); }
   .rp-tiles .rp-label { grid-column: 1; }
-  .rp-tiles .rp-delta, .rp-tiles .rp-src { grid-column: 1; margin-top: 2px; }
-  .rp-tiles .rp-big { grid-column: 2; grid-row: 1 / span 2; margin: 0; font-size: 28px; text-align: right; white-space: nowrap; }
+  .rp-tiles .rp-delta, .rp-tiles .rp-src, .rp-tiles .rp-medido { grid-column: 1; margin-top: 2px; }
+  .rp-tiles .rp-big { grid-column: 2; grid-row: 1 / span 3; margin: 0; font-size: 28px; text-align: right; white-space: nowrap; }
   .rp-tiles .rp-big small { font-size: 13px; }
   .rp-tiles .rp-alertcard { border-top-width: 0; }
   .rp-tiles > .rp-card.rp-alertcard + .rp-card, .rp-tiles > .rp-card + .rp-card.rp-alertcard { border-top: 1px solid var(--color-border-line); }
@@ -277,6 +277,8 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
 .rp-tres h3 { margin: 0 0 4px; font-size: var(--cds-font-size-body); font-weight: 600; }
 .rp-tres p { margin: 0; }
 .rp { --rp-clay: #8f6446; --rp-sand: #e6c25a; }
+.rp-medido { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: 2px; }
+.rp-medido.old { color: var(--color-warn); }
 .rp-hint { margin: 0 0 var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
 .rp-one input { -webkit-appearance: none; appearance: none; display: block; height: 28px; background: transparent; margin: 0; width: 100%; }
 .rp-one input::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--color-border-line) 0 var(--b), color-mix(in srgb, var(--rp-sim) 45%, transparent) var(--b) 100%); }
@@ -398,8 +400,8 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
 <div class="rp">
   <header class="rp-head" id="inicio">
     <h1>Crecida del Paraná y cómo afecta al Río Negro</h1>
-    <div class="rp-fresh" id="fresh" data-source="situacion"><span class="rp-fresh-dot"></span><span>Última actualización: <b id="fresh-txt">—</b></span></div>
-    <p class="rp-freshnote">Se actualiza automáticamente cuatro veces por día, a las 9, 12, 16 y 20 horas, con datos de fuentes oficiales.</p>
+    <div class="rp-fresh" id="fresh" data-source="situacion"><span class="rp-fresh-dot"></span><span>Revisado: <b id="fresh-txt">—</b></span></div>
+    <p class="rp-freshnote">Se revisa automáticamente cuatro veces por día, a las 10, 13, 17 y 21 horas, con datos de fuentes oficiales.</p>
   </header>
 
   <section class="rp-tiles" id="hoy">
@@ -407,6 +409,7 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
       <div class="rp-label">Altura actual del Paraná en Barranqueras</div>
       <div class="rp-big"><span class="dash-skeleton" data-source="resumen" data-field="altura_m" data-row="0">—</span> <small>metros</small></div>
       <div class="rp-delta" id="delta-dia"></div>
+      <div class="rp-medido" id="medido"></div>
     </div>
     <div class="rp-card rp-alertcard">
       <div class="rp-label">Le falta subir para el nivel de alerta</div>
@@ -1227,6 +1230,15 @@ window.rpState = { range: 15, idx: null };
     const fecha = window.rpLong(window.rpParse(s.fecha));
     dDia.textContent = `${s.cambio_dia_cm >= 0 ? '▲' : '▼'} ${window.rpFmtCm(s.cambio_dia_cm)} cm desde ayer`;
     dDia.className = 'rp-delta ' + (s.cambio_dia_cm > 0 ? 'rp-up' : s.cambio_dia_cm < 0 ? 'rp-down' : '');
+    // de qué día es la medición (puede no ser de hoy si la fuente todavía no publicó el dato del día)
+    const med = document.getElementById('medido');
+    if (med) {
+      const hoyAR = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
+      const fd = String(s.fecha).slice(0, 10), ayer = new Date(Date.parse(hoyAR + 'T12:00:00Z') - 864e5).toISOString().slice(0, 10);
+      const dia = window.rpDate.utcFormat('%A %-d')(window.rpParse(fd));
+      med.textContent = fd === hoyAR ? `Medición de hoy, ${dia} (Prefectura)` : fd === ayer ? `Medición de ayer, ${dia}. Hoy todavía no hay dato.` : `Medición del ${dia}`;
+      med.classList.toggle('old', fd !== hoyAR);
+    }
     ritmo.textContent = s.ritmo_cm_dia > 0
       ? `Viene subiendo ~${s.ritmo_cm_dia} cm por día (últimos 7 días)`
       : `En los últimos 7 días no subió (${window.rpFmtCm(s.ritmo_cm_dia)} cm/día)`;

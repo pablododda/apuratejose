@@ -12,7 +12,7 @@ Estructura:
 ## Qué hacer en cada corrida
 
 Mirá la hora actual en Argentina (`TZ=America/Argentina/Buenos_Aires date`).
-- Corrida de la mañana (antes de las 11): ACTUALIZACIÓN COMPLETA (pasos 1 a 7).
+- Corrida de la mañana (antes de las 12): ACTUALIZACIÓN COMPLETA (pasos 1 a 7).
 - Corridas de mediodía, tarde y noche: ACTUALIZACIÓN LIVIANA (pasos 1, 7 y, si encontrás algo nuevo de la APA sobre compuertas en una búsqueda rápida, el paso 3).
 
 Si una fuente no responde, dejá ese archivo como está y seguí con el resto.
@@ -21,7 +21,10 @@ Si una fuente no responde, dejá ese archivo como está y seguí con el resto.
 Array `[{fecha:"YYYY-MM-DD", altura_m:number, hora?:"HH:MM"}]` ordenado por fecha.
 - Fuente principal: Prefectura. `curl -sS -m 40 --http1.1 -A "Mozilla/5.0" https://contenidosweb.prefecturanaval.gob.ar/alturas/` y buscá las filas BARRANQUERAS y CORRIENTES (último registro, fecha y hora).
 - Si no responde: https://fich.unl.edu.ar/cim/rios/historico/25 (tabla diaria) o https://fich.unl.edu.ar/cim/rios/parana/alturas.
-- Si la lectura es más nueva que la última fila (fecha y hora), actualizá la fila de esa fecha o agregá una nueva, con `hora` en hora de Argentina. Mantené las filas existentes; corregí si la fuente cambió un valor.
+- Usá la fecha y la hora EXACTAS que la fuente muestra para esa lectura de Barranqueras (Prefectura muestra, por ejemplo, `13/OCT/26 - 0000`: eso es fecha 2026-10-13 y hora "00:00"). Nunca inventes ni copies una hora de otra fila.
+- REGLA IMPORTANTE: solo podés agregar o cambiar la fila de un día si la fuente muestra una lectura de Barranqueras de ESE día. Si la fuente todavía muestra la lectura de ayer (el dato de hoy no se publicó), NO agregues una fila para hoy ni repitas el valor de ayer con fecha de hoy: dejá el archivo como está. La página avisa sola que la medición es de ayer.
+- Si la lectura es más nueva que la última fila (fecha y hora), actualizá la fila de esa fecha o agregá una nueva. Mantené las filas existentes; corregí si la fuente cambió un valor.
+- Si Prefectura y FICH no coinciden en el día, usá la lectura más reciente de las dos (mirando la fecha que muestra cada una).
 - Actualizá también la primera fila de `pronostico.json` (tipo "ultimo dato": fecha, min_m y max_m = esa altura).
 
 ### 2. pronostico.json
