@@ -20,7 +20,8 @@ Si una fuente no responde, dejá ese archivo como está y seguí con el resto.
 ### 1. parana_barranqueras.json
 Array `[{fecha:"YYYY-MM-DD", altura_m:number, hora?:"HH:MM"}]` ordenado por fecha.
 - Fuente principal: Prefectura. `curl -sS -m 40 --http1.1 -A "Mozilla/5.0" https://contenidosweb.prefecturanaval.gob.ar/alturas/` y buscá las filas BARRANQUERAS y CORRIENTES (último registro, fecha y hora).
-- Si no responde: https://fich.unl.edu.ar/cim/rios/historico/25 (tabla diaria) o https://fich.unl.edu.ar/cim/rios/parana/alturas.
+- Si Prefectura no responde (corta la conexión), probá de nuevo una vez con `curl -sS -m 60 --http1.1 --retry 2 -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15" -H "Accept-Language: es-AR,es" https://contenidosweb.prefecturanaval.gob.ar/alturas/`.
+- Si sigue sin responder, usá SOLO la tabla https://fich.unl.edu.ar/cim/rios/historico/25: cada fila tiene la fecha y la hora REALES de la lectura (la primera fila es la más reciente). NO uses https://fich.unl.edu.ar/cim/rios/parana/alturas para la fecha: esa página muestra la fecha de hoy aunque el dato sea de ayer.
 - Usá la fecha y la hora EXACTAS que la fuente muestra para esa lectura de Barranqueras (Prefectura muestra, por ejemplo, `13/OCT/26 - 0000`: eso es fecha 2026-10-13 y hora "00:00"). Nunca inventes ni copies una hora de otra fila.
 - REGLA IMPORTANTE: solo podés agregar o cambiar la fila de un día si la fuente muestra una lectura de Barranqueras de ESE día. Si la fuente todavía muestra la lectura de ayer (el dato de hoy no se publicó), NO agregues una fila para hoy ni repitas el valor de ayer con fecha de hoy: dejá el archivo como está. La página avisa sola que la medición es de ayer.
 - Si la lectura es más nueva que la última fila (fecha y hora), actualizá la fila de esa fecha o agregá una nueva. Mantené las filas existentes; corregí si la fuente cambió un valor.
