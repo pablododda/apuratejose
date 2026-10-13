@@ -176,6 +176,20 @@
   .rp-tiles > .rp-card.rp-alertcard + .rp-card, .rp-tiles > .rp-card + .rp-card.rp-alertcard { border-top: 1px solid var(--color-border-line); }
 }
 @media (max-width: 859px) { .rp-simout .ghost { display: none; } }
+
+.rp-cortebox { margin-top: var(--cds-gap-xs); }
+.rp-corte { margin-top: var(--cds-gap-md); }
+.rp-cortectl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: var(--cds-gap-sm); min-height: 34px; }
+.rp-simbtn { font: inherit; font-size: var(--cds-font-size-caption); font-weight: 600; color: var(--rp-sim); background: color-mix(in srgb, var(--rp-sim) 10%, transparent); border: 1px solid var(--rp-sim); border-radius: 999px; padding: 6px 14px; cursor: pointer; white-space: nowrap; }
+.rp-simbtn:hover { background: color-mix(in srgb, var(--rp-sim) 18%, transparent); }
+.rp-simbtn:disabled { opacity: .6; cursor: default; }
+.rp-cortecap { font-size: var(--cds-font-size-body); color: var(--color-fg); flex: 1 1 260px; }
+.rp-corte figcaption .rp-note { font-weight: 400; }
+.rp-tres { display: grid; gap: var(--cds-gap-md); grid-template-columns: minmax(0, 1fr); margin-top: var(--cds-gap-md); }
+@media (min-width: 860px) { .rp-tres { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--cds-gap-lg); } }
+.rp-tres h3 { margin: 0 0 4px; font-size: var(--cds-font-size-body); font-weight: 600; }
+.rp-tres p { margin: 0; }
+.rp { --rp-clay: #8f6446; --rp-sand: #e6c25a; }
 .rp-hint { margin: 0 0 var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
 .rp-one input { -webkit-appearance: none; appearance: none; display: block; height: 28px; background: transparent; margin: 0; width: 100%; }
 .rp-one input::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--color-border-line) 0 var(--b), color-mix(in srgb, var(--rp-sim) 45%, transparent) var(--b) 100%); }
@@ -216,9 +230,9 @@
 #grafico .rp-simout { margin-top: var(--cds-gap-sm); }
 .rp-rainh { margin: var(--cds-gap-lg) 0 2px; font-size: var(--cds-font-size-heading); font-weight: 600; }
 .rp-rain.dim { opacity: .45; }
-#grafico { --rp-rn: #2f7a72; --rp-sim: #7b4fc9; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #grafico { --rp-rn: #4f9a90; --rp-sim: #a888e8; } }
-:root[data-theme="dark"] #grafico { --rp-rn: #4f9a90; --rp-sim: #a888e8; }
+.rp { --rp-rn: #2f7a72; --rp-sim: #7b4fc9; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rp { --rp-rn: #4f9a90; --rp-sim: #a888e8; } }
+:root[data-theme="dark"] .rp { --rp-rn: #4f9a90; --rp-sim: #a888e8; }
 /* rojo de evacuación más rojo que el naranja de alerta (modo claro) */
 .rp { --color-bad: #d81e1e; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rp { --color-bad: #ef6f61; } }
@@ -393,6 +407,22 @@
       </figure>
     </div>
     <p class="rp-src">Fuentes: <a href="https://repositorio.unne.edu.ar/bitstream/handle/123456789/30774/RIUNNE_FAU_AC_Roces_C.pdf?sequence=1&amp;isAllowed=y" target="_blank" rel="noopener">UNNE</a> · <a href="https://www.diarionorte.com/308908-hace-43-anos-colapsaba-el-dique-regulador-del-rio-negro" target="_blank" rel="noopener">Diario Norte</a></p>
+  </section>
+
+  <section class="rp-card" id="romper">
+    <h2>¿Se puede volver a romper el dique?</h2>
+    <p class="rp-note">El dique actual está apoyado sobre arena. Su punto débil no es el hormigón sino lo que tiene debajo: si el agua encuentra un camino por abajo, se lleva la arena y el dique se queda sin apoyo.</p>
+    <figure class="rp-scene rp-corte">
+      <figcaption><b>Corte del dique, de costado</b> <span class="rp-note">(ejemplo: Paraná a 7,50 m y compuertas cerradas)</span></figcaption>
+      <div class="rp-cortebox" id="corte"></div>
+      <div class="rp-cortectl"><button type="button" class="rp-simbtn" id="corte-btn">▶ Ver qué pasaría si se va la arena</button><span class="rp-cortecap" id="corte-cap" aria-live="polite"></span></div>
+    </figure>
+    <div class="rp-tres">
+      <div><h3>Cómo está hecho</h3><p class="rp-note">El hormigón se apoya sobre una capa de 2 metros de arcilla mezclada con cal y bien apisonada, que casi no deja pasar el agua. En el canal de salida, una tela y colchonetas de piedra protegen ese fondo de la corriente.</p></div>
+      <div><h3>Qué se encontró</h3><p class="rp-note">Según el geólogo Ramón Vargas, en el canal de salida el fondo se hundió hasta 6 metros y los terraplenes de los costados unos 5: se fueron unos 25.000 m³ de suelo. Dice que nunca se investigó por qué.</p></div>
+      <div><h3>Cuándo hay más riesgo</h3><p class="rp-note">Con las compuertas cerradas y el Paraná mucho más alto que el Río Negro, el agua empuja por debajo del dique. Por eso se busca que el Río Negro suba acompañando al Paraná. Con las compuertas abiertas, como hoy, los dos lados están al mismo nivel y no hay ese empuje.</p></div>
+    </div>
+    <p class="rp-src">Fuentes: datos y fotos del geólogo Ramón Vargas (Fundación Encuentro por la Vida) · <a href="https://www.diariolavozdelchaco.com/2026/10/12/vargas-advirtio-sobre-la-creciente-del-parana-y-la-seguridad-del-dique-del-rio-negro/" target="_blank" rel="noopener">La Voz del Chaco (12 oct)</a> · cotas, <a href="https://repositorio.unne.edu.ar/bitstream/handle/123456789/30774/RIUNNE_FAU_AC_Roces_C.pdf?sequence=1&amp;isAllowed=y" target="_blank" rel="noopener">UNNE</a>. La APA no informó el estado de la obra.</p>
   </section>
 
   <section class="rp-card" id="tu-zona">
@@ -932,44 +962,51 @@ window.rpState = { range: 15, idx: null };
     if (D.prevOpen === undefined || still() || D.fresh) wall.interrupt().attr('height', wallH);
     else if (changed) wall.interrupt().transition().duration(open ? 900 : 1200).ease(open ? d3.easeCubicInOut : d3.easeBounceOut).attr('height', wallH);
     lab(gDyn, 'Dique', (damL + damR) / 2, damTop - 6, 'middle', true, null, narrow ? 11 : 12);
-    gFlow.selectAll('*').remove(); gPump.selectAll('*').remove();
     if (D.prevOpen === undefined || still() || D.fresh) { gFlow.interrupt().attr('opacity', open ? 1 : 0); gPump.interrupt().attr('opacity', open ? 0 : 1); }
     else if (changed && !open) { gFlow.interrupt().transition().duration(250).attr('opacity', 0); gPump.interrupt().attr('opacity', 0).transition().delay(650).duration(700).attr('opacity', 1); }
     else if (changed && open) { gPump.interrupt().transition().duration(350).attr('opacity', 0); gFlow.interrupt().attr('opacity', 0).transition().delay(550).duration(500).attr('opacity', 1); }
     D.prevOpen = open; D.fresh = false;
     gDyn.append('line').attr('x1', 0).attr('x2', W).attr('y1', damTop).attr('y2', damTop).attr('stroke', 'var(--color-fg-muted)').attr('stroke-width', 1.2).attr('stroke-dasharray', '2 3');
     lab(gDyn, narrow ? 'tope 9,5 m' : 'tope del dique 9,5 m', W - 2, damTop - 5, 'end', false, 'var(--color-fg-muted)', 10);
-    // abierta: el Río Negro desagota al Paraná por debajo
-    const ay = bottom - gapH / 2;
-    gFlow.append('path').attr('d', `M${damR + 14},${ay} L${damL - 8},${ay}`).attr('stroke', 'var(--rp-rn)').attr('stroke-width', 2.5).attr('stroke-dasharray', '6 6').attr('class', 'rp-flow');
-    gFlow.append('path').attr('d', `M${damL - 4},${ay - 5} L${damL - 10},${ay} L${damL - 4},${ay + 5}`).attr('fill', 'none').attr('stroke', 'var(--rp-rn)').attr('stroke-width', 2);
-    // cerrada: la bomba saca el agua del Río Negro por arriba del dique
+    // la bomba y la corriente se dibujan una sola vez (si se redibujaran en cada paso, sus animaciones quedarían congeladas)
+    const pumpKey = [W, bottom, damTop, open ? 'abierto' : Math.round(ry), narrow, damL].join('|');
     const px = damR + (narrow ? 20 : 24), pipeTop = damTop - 26;
     const endX = damL - (narrow ? 18 : 26), endY = pipeTop + (narrow ? 18 : 30);
-    const pr = narrow ? 11 : 15, pcy = bottom - (narrow ? 26 : 66), pumpY = pcy - pr;
-    const pipe = `M${px},${pumpY} V${pipeTop} H${endX} V${endY}`;
-    gPump.append('path').attr('d', pipe).attr('fill', 'none').attr('stroke', 'var(--color-fg)').attr('stroke-width', 9).attr('stroke-linejoin', 'round');
-    gPump.append('path').attr('d', pipe).attr('fill', 'none').attr('stroke', 'var(--color-panel)').attr('stroke-width', 5.5).attr('stroke-linejoin', 'round');
-    gPump.append('path').attr('d', pipe).attr('fill', 'none').attr('stroke', blue).attr('stroke-width', 3.5).attr('stroke-dasharray', '7 5').attr('stroke-linejoin', 'round').attr('class', 'rp-flow');
-    // boca de la bomba: un caño corto igual que la manguera (dos líneas), que toma agua del Río Negro
-    const inX = px + pr + pr * 1.3;
-    const intake = `M${inX},${pcy} H${px}`;
-    gPump.append('path').attr('d', intake).attr('fill', 'none').attr('stroke', 'var(--color-fg)').attr('stroke-width', 9);
-    gPump.append('path').attr('d', intake).attr('fill', 'none').attr('stroke', 'var(--color-panel)').attr('stroke-width', 5.5);
-    gPump.append('path').attr('d', intake).attr('fill', 'none').attr('stroke', blue).attr('stroke-width', 3.5).attr('stroke-dasharray', '7 5').attr('class', 'rp-flow');
-    gPump.append('circle').attr('cx', px).attr('cy', pcy).attr('r', pr).attr('fill', 'var(--color-fg)');
-    const rot = gPump.append('g').attr('transform', `translate(${px},${pcy})`).append('g').attr('class', 'rp-spin');
-    [0, 120, 240].forEach((a) => rot.append('path').attr('d', `M0,0 L${pr * 0.62},${-pr * 0.18}`).attr('transform', `rotate(${a})`).attr('stroke', 'var(--color-panel)').attr('stroke-width', 2.5).attr('stroke-linecap', 'round'));
-    rot.append('circle').attr('r', 2.5).attr('fill', 'var(--color-panel)');
-    lab(gPump, 'bomba', inX + 8, pcy + 4, 'start', true, null, narrow ? 10 : 11);
-    for (let k = -1; k <= 1; k++) {
-      gPump.append('line').attr('x1', endX + k * 3).attr('y1', endY + 4).attr('x2', endX + k * 6).attr('y2', Math.max(endY + 8, sy - 2))
-        .attr('stroke', blue).attr('stroke-width', 2.5).attr('stroke-linecap', 'round').attr('stroke-dasharray', '3 4').attr('class', 'rp-flow');
+    if (D.pumpKey !== pumpKey || !gPump.node().firstChild) {
+      D.pumpKey = pumpKey;
+      gFlow.selectAll('*').remove(); gPump.selectAll('*').remove();
+      // abierta: el Río Negro desagota al Paraná por debajo
+      const ay = bottom - gapH / 2;
+      gFlow.append('path').attr('d', `M${damR + 14},${ay} L${damL - 8},${ay}`).attr('stroke', 'var(--rp-rn)').attr('stroke-width', 2.5).attr('stroke-dasharray', '6 6').attr('class', 'rp-flow');
+      gFlow.append('path').attr('d', `M${damL - 4},${ay - 5} L${damL - 10},${ay} L${damL - 4},${ay + 5}`).attr('fill', 'none').attr('stroke', 'var(--rp-rn)').attr('stroke-width', 2);
+      // cerrada: la bomba saca el agua del Río Negro por arriba del dique
+      const pr = narrow ? 11 : 15, pcy = bottom - (narrow ? 26 : 66), pumpY = pcy - pr;
+      const pipe = `M${px},${pumpY} V${pipeTop} H${endX} V${endY}`;
+      gPump.append('path').attr('d', pipe).attr('fill', 'none').attr('stroke', 'var(--color-fg)').attr('stroke-width', 9).attr('stroke-linejoin', 'round');
+      gPump.append('path').attr('d', pipe).attr('fill', 'none').attr('stroke', 'var(--color-panel)').attr('stroke-width', 5.5).attr('stroke-linejoin', 'round');
+      gPump.append('path').attr('d', pipe).attr('fill', 'none').attr('stroke', blue).attr('stroke-width', 3.5).attr('stroke-dasharray', '7 5').attr('stroke-linejoin', 'round').attr('class', 'rp-flow');
+      // boca de la bomba: un caño corto igual que la manguera (dos líneas), que toma agua del Río Negro
+      const inX = px + pr + pr * 1.3;
+      const intake = `M${inX},${pcy} H${px}`;
+      gPump.append('path').attr('d', intake).attr('fill', 'none').attr('stroke', 'var(--color-fg)').attr('stroke-width', 9);
+      gPump.append('path').attr('d', intake).attr('fill', 'none').attr('stroke', 'var(--color-panel)').attr('stroke-width', 5.5);
+      gPump.append('path').attr('d', intake).attr('fill', 'none').attr('stroke', blue).attr('stroke-width', 3.5).attr('stroke-dasharray', '7 5').attr('class', 'rp-flow');
+      gPump.append('circle').attr('cx', px).attr('cy', pcy).attr('r', pr).attr('fill', 'var(--color-fg)');
+      const rot = gPump.append('g').attr('transform', `translate(${px},${pcy})`).append('g').attr('class', 'rp-spin');
+      [0, 120, 240].forEach((a) => rot.append('path').attr('d', `M0,0 L${pr * 0.62},${-pr * 0.18}`).attr('transform', `rotate(${a})`).attr('stroke', 'var(--color-panel)').attr('stroke-width', 2.5).attr('stroke-linecap', 'round'));
+      rot.append('circle').attr('r', 2.5).attr('fill', 'var(--color-panel)');
+      lab(gPump, 'bomba', inX + 8, pcy + 4, 'start', true, null, narrow ? 10 : 11);
+      for (let k = -1; k <= 1; k++) {
+        gPump.append('line').attr('class', 'rp-flow rp-jet').attr('data-k', k).attr('x1', endX + k * 3).attr('y1', endY + 4).attr('x2', endX + k * 6)
+          .attr('stroke', blue).attr('stroke-width', 2.5).attr('stroke-linecap', 'round').attr('stroke-dasharray', '3 4');
+      }
+      // la superficie del Río Negro (6 m) es la que sube si llueve mucho
+      const ax = W - 14, aTop = Math.max(pipeTop + 34, ry - 30);
+      gPump.append('path').attr('d', `M${ax},${ry - 3} V${aTop} M${ax - 5},${aTop + 7} L${ax},${aTop} L${ax + 5},${aTop + 7}`).attr('fill', 'none').attr('stroke', 'var(--color-warn)').attr('stroke-width', 2).attr('stroke-linecap', 'round');
+      lab(gPump, 'si llueve mucho, sube', ax + 6, aTop - 8, 'end', true, 'var(--color-warn)', 10);
     }
-    // la superficie del Río Negro (6 m) es la que sube si llueve mucho
-    const ax = W - 14, aTop = Math.max(pipeTop + 34, ry - 30);
-    gPump.append('path').attr('d', `M${ax},${ry - 3} V${aTop} M${ax - 5},${aTop + 7} L${ax},${aTop} L${ax + 5},${aTop + 7}`).attr('fill', 'none').attr('stroke', 'var(--color-warn)').attr('stroke-width', 2).attr('stroke-linecap', 'round');
-    lab(gPump, 'si llueve mucho, sube', ax + 6, aTop - 8, 'end', true, 'var(--color-warn)', 10);
+    // los chorros de la manguera llegan hasta el agua del Paraná, que va cambiando
+    gPump.selectAll('line.rp-jet').attr('y2', function () { return Math.max(endY + 8, sy - 2); });
     // manija para simular: sobre la superficie del Paraná
     const rb = dbox.getBoundingClientRect(), sc = rb.width / W;
     handle.style.left = (damL * 0.3 * sc) + 'px';
@@ -1251,32 +1288,51 @@ window.rpState = { range: 15, idx: null };
       const sv = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).style('overflow', 'visible').attr('role', 'img')
         .attr('aria-label', broken ? 'Dique roto en 1982, el agua inunda los barrios' : 'Dique reconstruido hoy, los barrios están secos');
       const damL = W * 0.38, damR = damL + 16, ground = ys(6.2);
-      const blue = dash.colors[0], wy = ys(hv);
+      const id = el.id, wy = ys(hv);
+      // mismos colores que el gráfico del dique: Paraná azul, Río Negro verde agua, con el mismo degradé
+      const defs = sv.append('defs');
+      const vg = (gid, col, top, bot, y1) => {
+        const g = defs.append('linearGradient').attr('id', gid).attr('gradientUnits', 'userSpaceOnUse').attr('x1', 0).attr('x2', 0).attr('y1', y1).attr('y2', bottom);
+        [[0, top], [1, bot]].forEach(([o, a]) => g.append('stop').attr('offset', o).attr('style', `stop-color:${col};stop-opacity:${a}`));
+      };
+      // Río Negro: en 1982 el Paraná entró y lo llevó a su misma altura; hoy queda en su nivel (como mucho la orilla, 6,2 m)
+      const rnH = broken ? hv : Math.min(hv, 6.2), ry = ys(rnH);
+      vg(id + '-pa', dash.colors[0], .44, .2, wy);
+      vg(id + '-rn', 'var(--rp-rn)', .55, .3, ry);
       sv.append('rect').attr('x', 0).attr('y', bottom).attr('width', W).attr('height', 16).attr('fill', 'var(--cds-chart-grid)');
-      // terreno de la ciudad (lado derecho)
-      sv.append('path').attr('d', `M${damR},${bottom} V${ys(4)} L${damR + 30},${ground} H${W} V${bottom} Z`).attr('fill', 'var(--color-border-line)');
-      // casas
-      const houses = d3.range(Math.max(3, Math.floor((W - damR - 50) / 34))).map((i) => damR + 44 + i * 34);
+      // agua: Paraná a la izquierda, Río Negro a la derecha hasta el borde
+      const pEnd = broken ? damR : damL; // con el dique roto, el agua pasa por el hueco
+      sv.append('rect').attr('x', 0).attr('y', wy).attr('width', pEnd).attr('height', bottom - wy).attr('fill', 'var(--color-panel)');
+      sv.append('rect').attr('x', 0).attr('y', wy).attr('width', pEnd).attr('height', bottom - wy).attr('fill', `url(#${id}-pa)`);
+      sv.append('rect').attr('x', damR).attr('y', ry).attr('width', W - damR).attr('height', bottom - ry).attr('fill', 'var(--color-panel)');
+      sv.append('rect').attr('x', damR).attr('y', ry).attr('width', W - damR).attr('height', bottom - ry).attr('fill', `url(#${id}-rn)`);
+      sv.append('line').attr('x1', 0).attr('x2', damL).attr('y1', wy).attr('y2', wy).attr('stroke', dash.colors[0]).attr('stroke-width', 1.5).attr('opacity', .7);
+      sv.append('line').attr('x1', damR).attr('x2', W).attr('y1', ry).attr('y2', ry).attr('stroke', 'var(--rp-rn)').attr('stroke-width', 1.5).attr('opacity', .8);
+      // barrios: siempre arriba del río, sobre su terreno
+      const hx0 = damR + 86, houses = d3.range(Math.max(2, Math.floor((W - hx0 - 6) / 32))).map((i) => hx0 + i * 32);
+      // terreno de los barrios: la orilla, por encima del agua del Río Negro
+      // el terreno de los barrios: un montículo que sube desde el fondo; semitransparente para que se vea el agua alrededor
+      sv.append('path').attr('d', `M${hx0 - 52},${bottom} C${hx0 - 34},${bottom} ${hx0 - 32},${ground} ${hx0 - 12},${ground} H${W} V${bottom} Z`)
+        .attr('fill', 'var(--color-fg-muted)').attr('opacity', broken ? .22 : .3);
+      sv.append('path').attr('d', `M${hx0 - 52},${bottom} C${hx0 - 34},${bottom} ${hx0 - 32},${ground} ${hx0 - 12},${ground} H${W}`)
+        .attr('fill', 'none').attr('stroke', 'var(--color-fg-muted)').attr('stroke-width', 1.2).attr('opacity', .6);
       houses.forEach((hx) => {
-        sv.append('path').attr('d', `M${hx},${ground} v-14 l10,-9 l10,9 v14 z`).attr('fill', 'var(--color-panel)').attr('stroke', 'var(--color-fg-muted)').attr('stroke-width', 1.2);
+        sv.append('path').attr('d', `M${hx},${ground} v-14 l10,-9 l10,9 v14 z`).attr('fill', broken ? 'none' : 'var(--color-panel)').attr('stroke', 'var(--color-fg-muted)').attr('stroke-width', 1.2);
       });
-      // agua del Paraná
-      sv.append('rect').attr('x', 0).attr('y', wy).attr('width', damL).attr('height', bottom - wy).attr('fill', blue).attr('opacity', .45);
+      sv.append('text').attr('x', Math.min((houses[0] + houses[houses.length - 1] + 20) / 2, W - (broken ? 58 : 24))).attr('y', broken ? ground + 16 : ground - 30).attr('text-anchor', 'middle').attr('font-size', 11).attr('fill', 'var(--color-fg)').text(broken ? 'barrios bajo el agua' : 'barrios');
       if (broken) {
-        // el agua pasa y tapa los barrios
-        sv.append('rect').attr('x', damL).attr('y', wy).attr('width', W - damL).attr('height', bottom - wy).attr('fill', blue).attr('opacity', .4);
         sv.append('path').attr('d', `M${damL},${ys(9.2)} V${ys(5)} l6,-6 l-4,-8 l8,-6 l6,10 V${ys(9.2)} Z`).attr('fill', 'var(--color-fg-muted)');
         sv.append('path').attr('d', `M${damL},${bottom} V${ys(1.5)} l5,4 l6,-5 l5,6 V${bottom} Z`).attr('fill', 'var(--color-fg-muted)');
-        [0, 1, 2].forEach((k) => sv.append('path').attr('d', `M${damL - 14},${ys(3.2) + k * 9} q14,-6 ${36},0`).attr('fill', 'none').attr('stroke', blue).attr('stroke-width', 2.5).attr('stroke-linecap', 'round').attr('class', 'rp-flow').attr('stroke-dasharray', '6 5'));
+        [0, 1, 2].forEach((k) => sv.append('path').attr('d', `M${damL - 14},${ys(3.2) + k * 9} q14,-6 ${36},0`).attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 2.5).attr('stroke-linecap', 'round').attr('class', 'rp-flow').attr('stroke-dasharray', '6 5'));
         sv.append('text').attr('x', damL + 8).attr('y', ys(9.6)).attr('text-anchor', 'middle').attr('font-size', 11).attr('font-weight', 600).attr('fill', 'var(--color-bad)').text('dique roto');
       } else {
-        const rnH = Math.min(hv, 6.2), ry = ys(rnH);
-        sv.append('rect').attr('x', damR).attr('y', ry).attr('width', 30).attr('height', bottom - ry).attr('fill', dash.colors[1] || blue).attr('opacity', .35);
         sv.append('rect').attr('x', damL).attr('y', ys(9.5)).attr('width', damR - damL).attr('height', bottom - ys(9.5)).attr('rx', 2).attr('fill', 'var(--color-fg-muted)');
         sv.append('text').attr('x', (damL + damR) / 2).attr('y', ys(9.5) - 4).attr('text-anchor', 'middle').attr('font-size', 11).attr('font-weight', 600).attr('fill', 'var(--color-fg)').text('dique · tope 9,5 m');
       }
-      sv.append('text').attr('x', damL / 2).attr('y', Math.min(bottom - 4, wy + 16)).attr('text-anchor', 'middle').attr('font-size', 11).attr('font-weight', 600).attr('fill', 'var(--color-fg)').text(`Paraná ${F2(hv)} m`);
-      sv.append('text').attr('x', (damR + W) / 2 + 10).attr('y', broken ? Math.min(bottom - 4, ground + 14) : ground + 14).attr('text-anchor', 'middle').attr('font-size', 11).attr('fill', 'var(--color-fg)').text(broken ? 'barrios bajo el agua' : 'barrios');
+      // nombres de los ríos, a la misma distancia del dique y debajo de cada superficie
+      const gd = 12;
+      sv.append('text').attr('x', damL - gd).attr('y', Math.min(bottom - 6, wy + 18)).attr('text-anchor', 'end').attr('font-size', 11).attr('font-weight', 600).attr('fill', 'var(--color-fg)').text(`Río Paraná ${F2(hv)} m`);
+      sv.append('text').attr('x', damR + gd).attr('y', Math.min(bottom - 6, ry + 18)).attr('text-anchor', 'start').attr('font-size', 11).attr('font-weight', 600).attr('fill', 'var(--color-fg)').text('Río Negro');
     };
     const e83 = h.data.find((d) => String(d.evento) === '1983');
     scene(document.getElementById('scene-83'), e83 ? Number(e83.altura_m) : 8.6, true);
@@ -1284,4 +1340,176 @@ window.rpState = { range: 15, idx: null };
     document.getElementById('scene-hoy-txt').textContent = `Hoy el Paraná está en ${F2(hoy)} m. El dique de la desembocadura fue reconstruido y ahora funciona con compuertas y bombas.`;
   });
 })();
+
+  // ---- ¿Se puede volver a romper el dique? Corte de costado (datos de Ramón Vargas; cotas pasadas a la regla de Barranqueras: cero = cota 41,90) ----
+  const CORTE = { done: false, running: false, timers: [] };
+  const CORTE_CAP = [
+    '',
+    '1. Con el Paraná más alto, el agua pasa por la arena de abajo y se la va llevando.',
+    '2. Sin arena que lo sostenga, el dique pierde apoyo y se cae.',
+    '3. El Paraná entra al Río Negro y los dos quedan a la misma altura, como en 1982.'
+  ];
+  function drawCorte() {
+    const el = document.getElementById('corte'); if (!el) return;
+    CORTE.timers.forEach(clearTimeout); CORTE.timers = []; CORTE.running = false;
+    el.replaceChildren();
+    const W = Math.max(300, el.clientWidth), narrow = W < 560, H = narrow ? 300 : 320;
+    const top = 22, bottom = H - 6, ys = d3.scaleLinear([-6.5, 10], [bottom, top]);
+    const sv = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).style('overflow', 'visible').attr('role', 'img')
+      .attr('aria-label', 'Corte del dique: el hormigón apoyado sobre una capa de arcilla, con el fondo hundido en el canal de salida y el agua empujando por debajo');
+    const defs = sv.append('defs');
+    const PA = 7.5, RN = 6;            // ejemplo
+    const clayTop = 1.1, clayBot = -0.9; // cota 43 y 41
+    const holeBot = clayTop - 6;       // se hundió hasta 6 m
+    const damW = narrow ? 18 : 22, damL = Math.round(W * 0.47), damR = damL + damW;
+    const vg = (gid, col, a1, a2, y1) => { const g = defs.append('linearGradient').attr('id', gid).attr('gradientUnits', 'userSpaceOnUse').attr('x1', 0).attr('x2', 0).attr('y1', y1).attr('y2', ys(clayTop)); [[0, a1], [1, a2]].forEach(([o, a]) => g.append('stop').attr('offset', o).attr('style', `stop-color:${col};stop-opacity:${a}`)); return g; };
+    vg('corte-pa', dash.colors[0], .44, .2, ys(PA)); const gRn = vg('corte-rn', 'var(--rp-rn)', .55, .3, ys(RN));
+    const lab = (t, x, y, anchor, opt = {}, g = sv) => g.append('text').attr('x', x).attr('y', y).attr('text-anchor', anchor).attr('font-size', opt.size || 11).attr('font-weight', opt.bold ? 600 : 400).attr('fill', opt.col || 'var(--color-fg)').text(t);
+    // suelo: arena del río abajo de todo
+    sv.append('rect').attr('x', 0).attr('y', ys(clayBot)).attr('width', W).attr('height', bottom - ys(clayBot)).attr('fill', 'var(--rp-sand)').attr('opacity', .42);
+    // la manta de arcilla con cal (cota 41 a 43)
+    sv.append('rect').attr('x', 0).attr('y', ys(clayTop)).attr('width', W).attr('height', ys(clayBot) - ys(clayTop)).attr('fill', 'var(--rp-clay)').attr('opacity', .55);
+    // el hueco que va dejando la arena que se lleva el agua (aparece en la animación)
+    const hx0 = damL - (narrow ? 118 : 170), hx1 = damL - (narrow ? 34 : 46);
+    // arranca en el fondo del pozo de 6 m y avanza por la arena hasta pasar debajo del dique
+    const hxM = (hx0 + hx1) / 2, vx0 = hxM, vx1 = damR + (narrow ? 60 : 80);
+    const hcY = (ys(holeBot) - 0.25 * ys(clayTop)) / 0.75; // control para que el fondo del pozo quede justo a 6 m
+    const vBot = `M${hxM},${ys(holeBot)} C${hxM + 50},${ys(holeBot - 0.3)} ${vx1 - 30},${ys(holeBot - 0.1)} ${vx1},${ys(clayBot)}`;
+    const voidD = `${vBot} L${hx1 - 6},${ys(clayBot)} L${hxM},${ys(holeBot) - 20} Z`;
+    defs.append('clipPath').attr('id', 'corte-vclip').append('rect').attr('id', 'corte-vclip-r').attr('x', vx0).attr('y', 0).attr('width', 0).attr('height', H);
+    const gVoid = sv.append('g').attr('clip-path', 'url(#corte-vclip)');
+    gVoid.append('path').attr('d', voidD).attr('fill', 'var(--color-panel)');
+    gVoid.append('path').attr('d', voidD).attr('fill', dash.colors[0]).attr('opacity', .28);
+    // la arcilla debajo del dique se rompe (aparece en la animación)
+    const brkD = `M${hx1},${ys(clayTop)} L${damR + 30},${ys(clayTop)} L${damR + 22},${ys(clayBot)} L${hx1 - 6},${ys(clayBot)} Z`;
+    const brk = sv.append('path').attr('d', brkD).attr('fill', 'var(--color-panel)').attr('opacity', 0);
+    const brkW = sv.append('path').attr('d', brkD).attr('fill', dash.colors[0]).attr('opacity', 0);
+    // agua: Paraná a la izquierda (canal de salida), Río Negro a la derecha
+    sv.append('rect').attr('x', 0).attr('y', ys(PA)).attr('width', damL).attr('height', ys(clayTop) - ys(PA)).attr('fill', 'var(--color-panel)');
+    sv.append('rect').attr('x', 0).attr('y', ys(PA)).attr('width', damL).attr('height', ys(clayTop) - ys(PA)).attr('fill', 'url(#corte-pa)');
+    const rnA = sv.append('rect').attr('x', damR).attr('y', ys(RN)).attr('width', W - damR).attr('height', ys(clayTop) - ys(RN)).attr('fill', 'var(--color-panel)');
+    const rnB = sv.append('rect').attr('x', damR).attr('y', ys(RN)).attr('width', W - damR).attr('height', ys(clayTop) - ys(RN)).attr('fill', 'url(#corte-rn)');
+    sv.append('line').attr('x1', 0).attr('x2', damL).attr('y1', ys(PA)).attr('y2', ys(PA)).attr('stroke', dash.colors[0]).attr('stroke-width', 1.5).attr('opacity', .7);
+    const rnL = sv.append('line').attr('x1', damR).attr('x2', W).attr('y1', ys(RN)).attr('y2', ys(RN)).attr('stroke', 'var(--rp-rn)').attr('stroke-width', 1.5).attr('opacity', .8);
+    // el pozo: donde se hundieron las colchonetas, en el canal de salida
+    const hole = `M${hx0},${ys(clayTop)} C${hx0 + 14},${hcY} ${hx1 - 14},${hcY} ${hx1},${ys(clayTop)} Z`;
+    sv.append('path').attr('d', hole).attr('fill', 'var(--color-panel)');
+    sv.append('path').attr('d', hole).attr('fill', 'url(#corte-pa)');
+    // el borde del pozo: la mitad derecha (la que da al dique) desaparece cuando el agua se lleva esa arena
+    const rimD = `M${hx0},${ys(clayTop)} C${hx0 + 14},${hcY} ${hx1 - 14},${hcY} ${hx1},${ys(clayTop)}`;
+    defs.append('clipPath').attr('id', 'corte-cl').append('rect').attr('x', 0).attr('y', 0).attr('width', hxM + 1).attr('height', H);
+    defs.append('clipPath').attr('id', 'corte-cr').append('rect').attr('x', hxM + 1).attr('y', 0).attr('width', W).attr('height', H);
+    const rim = sv.append('path').attr('d', rimD).attr('fill', 'none').attr('stroke', 'var(--color-bad)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 3').attr('clip-path', 'url(#corte-cl)');
+    const rimR = sv.append('path').attr('d', rimD).attr('fill', 'none').attr('stroke', 'var(--color-bad)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 3').attr('clip-path', 'url(#corte-cr)');
+    // colchonetas de piedra: sanas sobre la manta y hundidas en el pozo
+    const gMid = sv.append('g'); // las piedras de la pared del lado del dique y las de entre el pozo y el dique se caen al fondo del hueco
+    const stones = (x0, x1, yf, g = sv) => { for (let x = x0 + 4; x < x1 - 2; x += 8) g.append('circle').attr('cx', x).attr('cy', yf(x) - 3).attr('r', 3).attr('fill', 'var(--color-fg-muted)'); };
+    stones(0, hx0, () => ys(clayTop)); stones(hx1, damL, () => ys(clayTop), gMid);
+    const rn = rim.node(), L = rn.getTotalLength ? rn.getTotalLength() : 0;
+    for (let d = L * 0.12; d < L * 0.9; d += 8) { const p = rn.getPointAtLength(d); (p.x > hxM + 2 ? gMid : sv).append('circle').attr('cx', p.x).attr('cy', p.y - 3).attr('r', 3).attr('fill', 'var(--color-fg-muted)'); }
+    // el agua empuja por debajo, por la arena: entra por el pozo y sale del otro lado del dique
+    const yU = ys(holeBot - 0.15), yEnd = ys(clayBot) + 9, xS = hxM, yS = ys(holeBot) - 1, xE = damR + 56;
+    const seep = `M${xS},${yS} C${xS + 30},${yU} ${damL - 20},${yU} ${(damL + damR) / 2},${yU} S${xE},${yU} ${xE},${yEnd}`;
+    const gSeep = sv.append('g');
+    const seepP = gSeep.append('path').attr('d', seep).attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 2.5).attr('stroke-dasharray', '6 6').attr('stroke-linecap', 'round').attr('class', 'rp-flow');
+    gSeep.append('path').attr('d', `M${xE - 6},${yEnd + 8} L${xE},${yEnd} L${xE + 6},${yEnd + 8}`).attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 2);
+    const gGrains = sv.append('g');
+    // el dique de hormigón, con la compuerta cerrada, apoyado sobre la manta
+    const gDam = sv.append('g');
+    gDam.append('rect').attr('x', damL).attr('y', ys(9.5)).attr('width', damW).attr('height', ys(clayTop) - ys(9.5)).attr('rx', 2).attr('fill', 'var(--color-fg-muted)');
+    lab('Dique', (damL + damR) / 2, ys(9.5) - 6, 'middle', { bold: true }, gDam);
+    // el agua del Paraná pasando al Río Negro (aparece al final)
+    const ay = ys(PA) + (ys(clayTop) - ys(PA)) * 0.55;
+    // el agua que ocupa el lugar del dique cuando se cae (aparece al final)
+    const gGap = sv.append('g').attr('opacity', 0);
+    gGap.append('rect').attr('x', damL - 1).attr('y', ys(PA)).attr('width', damW + 2).attr('height', ys(clayTop) - ys(PA)).attr('fill', 'var(--color-panel)');
+    gGap.append('rect').attr('x', damL - 1).attr('y', ys(PA)).attr('width', damW + 2).attr('height', ys(clayTop) - ys(PA)).attr('fill', 'url(#corte-pa)');
+    gDam.raise();
+    const gIn = sv.append('g').attr('opacity', 0);
+    gIn.append('path').attr('d', `M${damL - 70},${ay} L${damR + 70},${ay}`).attr('stroke', dash.colors[0]).attr('stroke-width', 2.5).attr('stroke-dasharray', '6 6').attr('class', 'rp-flow').attr('fill', 'none');
+    gIn.append('path').attr('d', `M${damR + 64},${ay - 6} L${damR + 71},${ay} L${damR + 64},${ay + 6}`).attr('stroke', dash.colors[0]).attr('stroke-width', 2).attr('fill', 'none');
+    // rótulos
+    lab('Río Paraná 7,50 m', damL - 12, ys(PA) + 18, 'end', { bold: true });
+    lab('canal de salida', damL - 12, ys(PA) + 33, 'end', { col: 'var(--color-fg-muted)' });
+    const rnT = lab('Río Negro 6,00 m', damR + 12, ys(RN) + 18, 'start', { bold: true });
+    const gDiff = sv.append('g');
+    const bx = damR + 6;
+    gDiff.append('path').attr('d', `M${bx},${ys(PA)} H${bx + 5} V${ys(RN)} H${bx}`).attr('fill', 'none').attr('stroke', 'var(--color-warn)').attr('stroke-width', 1.5);
+    gDiff.append('line').attr('x1', damR).attr('x2', bx).attr('y1', ys(PA)).attr('y2', ys(PA)).attr('stroke', 'var(--color-warn)').attr('stroke-dasharray', '2 2');
+    lab('1,50 m de diferencia', bx + 9, (ys(PA) + ys(RN)) / 2 + 4, 'start', { col: 'var(--color-warn)', bold: true, size: 10 }, gDiff);
+    if (narrow) lab('se hundió hasta 6 m', (hx0 + hx1) / 2, ys(holeBot) + 16, 'middle', { col: 'var(--color-bad)', bold: true });
+    else lab('se hundió hasta 6 m', hx0 + 2, ys(holeBot) + 4, 'end', { col: 'var(--color-bad)', bold: true });
+    lab('colchonetas de piedra', narrow ? 4 : 8, ys(clayTop) - 10, 'start', { col: 'var(--color-fg-muted)', size: 10 });
+    lab('arcilla con cal (2 m)', W - 6, ys((clayTop + clayBot) / 2) + 4, 'end', { col: 'var(--color-fg)', size: 10 });
+    lab('arena del río', W - 6, bottom - 8, 'end', { col: 'var(--color-fg-muted)', size: 10 });
+    const gSeepT = sv.append('g');
+    // el texto va al lado de la flecha, dentro del dibujo
+    (narrow ? ['el agua empuja', 'por debajo y se', 'lleva la arena'] : ['el agua empuja por debajo', 'y se lleva la arena'])
+      .forEach((t, i) => lab(t, xE + 10, ys(clayBot) + 26 + i * 13, 'start', { col: dash.colors[0], bold: true, size: narrow ? 10 : 11 }, gSeepT));
+
+    // ---- estados de la animación ----
+    const pivot = `${damR},${ys(clayTop)}`;
+    const vclip = sv.select('#corte-vclip-r');
+    const st = {
+      void: (t) => vclip.transition().duration(t).ease(d3.easeCubicInOut).attr('width', vx1 - vx0 + 4),
+      fall: (t) => {
+        brk.transition().duration(t * 0.4).attr('opacity', 1); brkW.transition().duration(t * 0.4).attr('opacity', .28);
+        gDam.transition().duration(t).ease(d3.easeCubicIn).attr('transform', `translate(4,${(ys(clayBot) - ys(clayTop)) + 34}) rotate(18,${pivot})`);
+        gDam.select('text').transition().duration(t * 0.4).attr('opacity', 0);
+        gSeep.transition().duration(t * 0.5).attr('opacity', 0); gSeepT.transition().duration(t * 0.5).attr('opacity', 0);
+        gDiff.transition().duration(t * 0.4).attr('opacity', 0);
+        gGap.transition().delay(t * 0.6).duration(t * 0.4).attr('opacity', 1);
+        rimR.transition().duration(t * 0.5).attr('opacity', 0);
+        const vb = sv.append('path').attr('d', vBot).attr('fill', 'none').attr('stroke', 'none').node(), vl = vb.getTotalLength(), pts = [];
+        for (let d = 0; d <= vl; d += 2) pts.push(vb.getPointAtLength(d));
+        // se acomodan una al lado de la otra sobre el fondo del hueco, siguiendo su curva
+        const cs = gMid.selectAll('circle').nodes().sort((p, q) => +p.getAttribute('cx') - +q.getAttribute('cx'));
+        cs.forEach((n, i) => {
+          const p = vb.getPointAtLength(Math.min(vl, 4 + i * 7.5));
+          d3.select(n).transition().duration(t).ease(d3.easeCubicIn).attr('cx', p.x).attr('cy', p.y - 3);
+        });
+      },
+      fill: (t) => {
+        const y = ys(PA), h = ys(clayTop) - ys(PA);
+        [rnA, rnB].forEach((r) => r.transition().duration(t).ease(d3.easeCubicInOut).attr('y', y).attr('height', h));
+        rnL.transition().duration(t).ease(d3.easeCubicInOut).attr('y1', y).attr('y2', y);
+        gRn.transition().duration(t).attr('y1', y);
+        rnT.transition().duration(t).ease(d3.easeCubicInOut).attr('y', y + 18).attr('x', damR + (narrow ? 46 : 90)).tween('text', () => (k) => { rnT.text(`Río Negro ${window.rpFmt2(RN + (PA - RN) * k)} m`); });
+        gIn.transition().delay(t * 0.2).duration(t * 0.5).attr('opacity', 1);
+      },
+      grains: () => {
+        const len = seepP.node().getTotalLength();
+        for (let i = 0; i < 16; i++) {
+          gGrains.append('circle').attr('r', 2.6).attr('fill', 'var(--rp-sand)').attr('stroke', 'var(--rp-clay)').attr('stroke-width', .8)
+            .attr('opacity', 0).transition().delay(i * 170).duration(1500).ease(d3.easeLinear)
+            .attr('opacity', 1)
+            .attrTween('transform', () => (k) => { const p = seepP.node().getPointAtLength(k * len); return `translate(${p.x},${p.y})`; })
+            .on('end', function () { d3.select(this).remove(); });
+        }
+      }
+    };
+    if (CORTE.done) { st.void(0); st.fall(0); st.fill(0); corteCap(3); }
+    else corteCap(0);
+    CORTE.play = () => {
+      if (CORTE.running) return;
+      if (CORTE.done) { CORTE.done = false; drawCorte(); return; }
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { CORTE.done = true; drawCorte(); return; }
+      CORTE.running = true; corteBtn();
+      corteCap(1); st.grains(); st.void(3000);
+      CORTE.timers.push(setTimeout(() => { corteCap(2); st.fall(1500); }, 3200));
+      CORTE.timers.push(setTimeout(() => { corteCap(3); st.fill(2200); }, 4900));
+      CORTE.timers.push(setTimeout(() => { CORTE.running = false; CORTE.done = true; corteBtn(); }, 7300));
+    };
+    corteBtn();
+  }
+  function corteCap(i) { const c = document.getElementById('corte-cap'); if (c) c.textContent = CORTE_CAP[i]; }
+  function corteBtn() {
+    const b = document.getElementById('corte-btn'); if (!b) return;
+    b.disabled = CORTE.running;
+    b.textContent = CORTE.done ? '↺ Volver a empezar' : CORTE.running ? 'Mirá…' : '▶ Ver qué pasaría si se va la arena';
+  }
+  document.getElementById('corte-btn')?.addEventListener('click', () => CORTE.play && CORTE.play());
+  dash.onData(drawCorte);
+  let corteW = 0;
+  window.addEventListener('resize', () => { const el = document.getElementById('corte'); if (el && el.clientWidth !== corteW) { corteW = el.clientWidth; drawCorte(); } });
 </script>
