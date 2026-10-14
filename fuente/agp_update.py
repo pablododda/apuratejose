@@ -8,7 +8,7 @@
 Imprime CAMBIO=1 si cambió algo, para que el workflow arme index.html y haga commit.
 Uso, desde la raíz del repo: python3 fuente/agp_update.py
 """
-import datetime, json, os, re, urllib.request
+import datetime, json, os, re, ssl, urllib.request
 
 F = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(F, "data")
@@ -20,8 +20,18 @@ UA = {"User-Agent": "Mozilla/5.0 (apuratejose.com.ar; actualizacion horaria)"}
 
 
 def bajar(url):
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
-        return r.read().decode("utf-8", "replace")
+    req = urllib.request.Request(url, headers=UA)
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return r.read().decode("utf-8", "replace")
+    except urllib.error.URLError as e:
+        # el servidor del puerto no manda el certificado intermedio completo; son datos públicos de solo lectura,
+        # así que reintentamos sin verificar la cadena (y abajo se descarta cualquier salto raro de altura)
+        if "CERTIFICATE_VERIFY_FAILED" not in str(e) or "agpse.gob.ar" not in url:
+            raise
+        ctx = ssl.create_default_context(); ctx.check_hostname = False; ctx.verify_mode = ssl.CERT_NONE
+        with urllib.request.urlopen(req, timeout=60, context=ctx) as r:
+            return r.read().decode("utf-8", "replace")
 
 
 def agp():
@@ -79,6 +89,9 @@ def main():
     ult_t = datetime.datetime.strptime(ult["fecha"] + " " + (ult.get("hora") or "00:00"), "%Y-%m-%d %H:%M").replace(tzinfo=AR)
     if t <= ult_t:
         print("CAMBIO=0 (la última fila ya es igual o más nueva:", ult, ")")
+        return
+    if t - ult_t < datetime.timedelta(days=2) and abs(h - float(ult["altura_m"])) > 0.6:
+        print("CAMBIO=0 (salto sospechoso de", ult["altura_m"], "a", h, "; no se carga)")
         return
     fila = {"fecha": fecha, "altura_m": h, "hora": hora, "fuente": fuente}
     if ult["fecha"] == fecha:
