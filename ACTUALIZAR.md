@@ -42,12 +42,14 @@ Cómo elegir:
 Fuentes: INA (https://www.ina.gov.ar/alerta/, reporte diario https://alerta.ina.gob.ar/a5/diario/reporte_diario, informe semanal) y comunicados de la APA Chaco en la prensa (buscá "APA Paraná Barranqueras pronóstico" de los últimos días). Solo números atribuidos a INA o APA. Si no hay número oficial nuevo, mantené el vigente y quitá fechas que ya pasaron.
 
 ### 3. situacion.json
-Una fila: `{fecha, actualizado, alerta_apa, compuertas_rio_negro, tendencia, corrientes_m, resumen, pronostico_texto, fuentes, fuente_url}`.
+Una fila: `{fecha, actualizado, alerta_apa, compuertas_rio_negro, tendencia, corrientes_m, corrientes_fecha, resumen, pronostico_texto, fuentes, fuente_url, pronostico_url?}`.
+- Buscá SIEMPRE las noticias del día sobre la APA y el Paraná ("APA Morán Paraná", "APA compuertas río Negro", "Comité de Emergencia Chaco Paraná"), en La Voz del Chaco, Diario Norte, Data Chaco, Chaco Día por Día y chaco.gob.ar. Si hay un informe de la APA más nuevo que el de `fuente_url`, actualizá compuertas, alerta, pronóstico y `fuente_url` con ese informe.
 - `compuertas_rio_negro`: "Abiertas" o "Cerradas" SOLO si la APA (o el gobierno del Chaco) lo informó en los últimos días (buscá "APA compuertas río Negro" en la prensa y en chaco.gov.ar). Si el Paraná superó 6 m en Barranqueras y no hay confirmación de la APA, poné "Sin confirmar".
-- `fuente_url`: URL https de la nota o comunicado más reciente de la APA que usaste (si no hay nueva, dejá la anterior).
-- `corrientes_m`: lectura de Corrientes (Prefectura o INA).
+- `fuente_url`: URL https de la nota o comunicado MÁS RECIENTE de la APA (si no hay nueva, dejá la anterior). La página muestra "Último informe de la APA: <fecha de la URL>"; si la URL no tiene la fecha en la ruta, poné `fuente_fecha` (YYYY-MM-DD) y `fuente_medio`.
+- `pronostico_url`: URL de donde sale el pronóstico de `pronostico_texto` si NO es la misma nota de `fuente_url` (por ejemplo, el reporte del INA). Si es la misma, no lo pongas.
+- `corrientes_m` y `corrientes_fecha`: los actualiza solo el robot de cada hora (INA). No los toques.
 - `resumen`: UNA línea corta con el estado del Río Negro hoy (ej. "Dentro de su cauce. Las compuertas están abiertas (dato de la APA)."). No repitas la regla de los 6 m.
-- `pronostico_texto`: una o dos oraciones con el pronóstico oficial vigente (INA/APA).
+- `pronostico_texto`: una o dos oraciones con el pronóstico oficial vigente, empezando por quién lo dijo y cuándo (ej. "APA (14 oct): ..."). Si hay una alerta oficial vigente (ej. alerta naranja del Comité de Emergencia), nombrala acá también. `alerta_apa`: el color de esa alerta ("Amarilla", "Naranja", "Roja" o "").
 
 ### 4. umbrales.json e historicos.json
 No cambian, salvo que la APA, el INA o la UNNE publiquen niveles nuevos.
@@ -61,6 +63,15 @@ No cambian, salvo que la APA, el INA o la UNNE publiquen niveles nuevos.
 `pip install pillow` si falta, y desde la raíz del repo:
 `python3 -I fuente/sat_update.py fuente/data/satelite.json fuente/data/parana_barranqueras.json fuente/data/satelite.json 30`
 Si no hay acceso a gibs.earthdata.nasa.gov, dejalo como está.
+
+### 6b. Control de coherencia (SIEMPRE, antes de publicar)
+La página tiene que coincidir con sus fuentes. Si algo de esto falla, corregilo antes de publicar:
+- Cada número de la página tiene una fuente con un link que lleva a ese mismo número: altura (fila `fuente` de parana_barranqueras.json), compuertas y pronóstico (`fuente_url` / `pronostico_url`), Corrientes (INA), lluvia (SMN y Meteored).
+- `pronostico.json`: ninguna fila "pronostico" con fecha pasada; la primera fila es la última medición.
+- `lluvia.json`: empieza HOY y sigue 2 o 3 días. Nada de días pasados.
+- Si el Paraná está en 6 m o más y la última información de la APA dice "Abiertas" de un día anterior a que pasara los 6 m, poné "Sin confirmar".
+- `pronostico_texto` no contradice la altura actual (ej. no decir "podría llegar a 5,50 m" si ya está en 5,53).
+- Ningún texto dice "hoy" con un dato de otro día.
 
 ### 7. Publicar
 1. En `situacion.json` poné `actualizado` = hora actual en ISO con zona -03:00 (ej. 2026-10-13T12:15:00-03:00), siempre que al menos una fuente haya respondido. Es lo que la página muestra arriba como "Última actualización".

@@ -332,7 +332,7 @@
     <div class="rp-card">
       <div class="rp-label">Río Negro: compuertas del dique</div>
       <div class="rp-big rp-gate" id="gate-tile"><span class="dash-skeleton" data-source="situacion" data-field="compuertas_rio_negro" data-row="0">—</span></div>
-      <p class="rp-src">Fuente: <a class="src-apa" href="https://www.diariolavozdelchaco.com/2026/10/10/alerta-por-crecida-del-parana-apa-pidio-anticipar-medidas-en-las-zonas-riberenas/" target="_blank" rel="noopener">APA Chaco, vía La Voz del Chaco (10 oct)</a></p>
+      <p class="rp-src"><span class="src-apa-pre">Último informe de la APA</span>: <a class="src-apa" href="https://www.diariolavozdelchaco.com/2026/10/14/moran-advirtio-que-el-parana-llegara-a-los-6-metros-y-permanecera-alto/" target="_blank" rel="noopener">14 oct (La Voz del Chaco)</a></p>
     </div>
   </section>
 
@@ -354,7 +354,7 @@
         <div class="rp-pof" id="pronostico">
           <h3 class="rp-rainh">Pronóstico oficial</h3>
           <p class="rp-text"><span data-source="situacion" data-field="pronostico_texto" data-row="0">—</span></p>
-          <p class="rp-note">Corrientes, río arriba, está en <span data-source="situacion" data-field="corrientes_m" data-row="0">—</span> m. Lo que sube allá suele verse en Barranqueras poco después.</p>
+          <p class="rp-note">Corrientes, río arriba, <span id="corr-cuando">estaba</span> en <span data-source="situacion" data-field="corrientes_m" data-row="0">—</span> m<span id="corr-fecha"></span> (<a href="https://www.hidraulica.gob.ar/nivhidr.php" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Prefectura vía INA</a>). Lo que sube allá suele verse en Barranqueras poco después.</p>
         </div>
       </div>
       <div class="rp-split-b">
@@ -384,7 +384,7 @@
         <input id="dia" type="range" min="0" max="1000" step="any" value="0" aria-label="Elegí un día o, más a la derecha, simulá que el Paraná sigue subiendo">
       </div>
     </div>
-    <p class="rp-src">Fuentes: <a id="src-altura" href="https://hidrografia2.agpse.gob.ar/Barranqueras/marea.html" target="_blank" rel="noopener" title="Estación automática del puerto de Barranqueras (cada hora)">altura</a> · <a href="https://www.ina.gob.ar/alerta/" target="_blank" rel="noopener" title="Instituto Nacional del Agua (INA)">pronóstico</a> · <a href="https://litigio.com.ar/2026/03/19/piden-a-la-justicia-que-prohiba-a-la-apa-desviar-el-rio-negro-hacia-el-salado/" target="_blank" rel="noopener" title="Manual de Operaciones de la APA (Res. 049/02), citado por Litigio">cierre del dique a 6 m</a> · <a href="https://www.smn.gob.ar/" target="_blank" rel="noopener" title="Servicio Meteorológico Nacional">lluvia</a> · <a href="https://www.meteored.com.ar/tiempo-en_Resistencia-America+Sur-Argentina-Chaco-SARE-1-16890.html" target="_blank" rel="noopener" title="Meteored, estimación no oficial">milímetros</a></p>
+    <p class="rp-src">Fuentes: <a id="src-altura" href="https://hidrografia2.agpse.gob.ar/Barranqueras/marea.html" target="_blank" rel="noopener" title="Estación automática del puerto de Barranqueras (cada hora)">altura</a> · <a id="src-pron" href="https://www.ina.gob.ar/alerta/" target="_blank" rel="noopener" title="Pronóstico oficial vigente (APA o INA)">pronóstico</a> · <a href="https://litigio.com.ar/2026/03/19/piden-a-la-justicia-que-prohiba-a-la-apa-desviar-el-rio-negro-hacia-el-salado/" target="_blank" rel="noopener" title="Manual de Operaciones de la APA (Res. 049/02), citado por Litigio">cierre del dique a 6 m</a> · <a href="https://www.smn.gob.ar/" target="_blank" rel="noopener" title="Servicio Meteorológico Nacional">lluvia</a> · <a href="https://www.meteored.com.ar/tiempo-en_Resistencia-America+Sur-Argentina-Chaco-SARE-1-16890.html" target="_blank" rel="noopener" title="Meteored, estimación no oficial">milímetros</a></p>
   </section>
 
 
@@ -423,7 +423,7 @@
     <div class="rp-tres">
       <div><h3>Cómo está hecho</h3><p class="rp-note">El hormigón se apoya sobre una capa de 2 metros de arcilla mezclada con cal y bien apisonada, que casi no deja pasar el agua. En el canal de salida, una tela y colchonetas de piedra protegen ese fondo de la corriente.</p></div>
       <div><h3>Qué se encontró</h3><p class="rp-note">Según el geólogo Ramón Vargas, en el canal de salida el fondo se hundió hasta 6 metros y los terraplenes de los costados unos 5: se fueron unos 25.000 m³ de suelo. Dice que nunca se investigó por qué.</p></div>
-      <div><h3>Cuándo hay más riesgo</h3><p class="rp-note">Con las compuertas cerradas y el Paraná mucho más alto que el Río Negro, el agua empuja por debajo del dique. Por eso se busca que el Río Negro suba acompañando al Paraná. Con las compuertas abiertas, como hoy, los dos lados están al mismo nivel y no hay ese empuje.</p></div>
+      <div><h3>Cuándo hay más riesgo</h3><p class="rp-note">Con las compuertas cerradas y el Paraná mucho más alto que el Río Negro, el agua empuja por debajo del dique. Por eso se busca que el Río Negro suba acompañando al Paraná. <span id="riesgo-hoy">Con las compuertas abiertas, los dos lados están al mismo nivel y no hay ese empuje.</span></p></div>
     </div>
     <p class="rp-src">Fuentes: datos y fotos del geólogo Ramón Vargas (Fundación Encuentro por la Vida) · <a href="https://www.diariolavozdelchaco.com/2026/10/12/vargas-advirtio-sobre-la-creciente-del-parana-y-la-seguridad-del-dique-del-rio-negro/" target="_blank" rel="noopener">La Voz del Chaco (12 oct)</a> · cotas, <a href="https://repositorio.unne.edu.ar/bitstream/handle/123456789/30774/RIUNNE_FAU_AC_Roces_C.pdf?sequence=1&amp;isAllowed=y" target="_blank" rel="noopener">UNNE</a>. La APA no informó el estado de la obra.</p>
   </section>
@@ -432,7 +432,7 @@
     <div class="rp-duo">
       <div class="rp-duo-a">
         <h2>Norte de Resistencia desde el satélite</h2>
-        <p class="rp-note">Arrastrá la línea sobre la imagen para comparar antes de la crecida con la imagen más reciente sin nubes.</p>
+        <p class="rp-note">Arrastrá la línea sobre la imagen para comparar antes de la crecida con la imagen más reciente con pocas nubes.</p>
         <div class="rp-satbox" id="sat" data-source="satelite">
           <img class="rp-satimg" draggable="false" id="sat-antes" alt="Imagen satelital antes de la crecida">
           <img class="rp-satimg rp-sattop" draggable="false" id="sat-ahora" alt="Imagen satelital más reciente">
@@ -449,7 +449,7 @@
       <div class="rp-duo-b">
         <h2>Qué mirar en esta zona</h2>
         <p class="rp-text">El punto rojo marca el <b>dique regulador</b>, donde el Río Negro desemboca en el Paraná (el agua marrón, abajo a la derecha). El <b>Río Negro</b> es la línea verde que serpentea por el norte de la ciudad: con las <b>compuertas cerradas y mucha lluvia</b>, es el que puede subir.</p>
-        <p class="rp-note">El satélite pasa cada 2 o 3 días y solo se muestran los días sin nubes, por eso la imagen puede tener algunos días de atraso. Cada punto de la imagen equivale a unos 30 metros.</p>
+        <p class="rp-note">El satélite pasa cada 2 o 3 días y solo se muestran los días con pocas nubes, por eso la imagen puede tener algunos días de atraso. Cada punto de la imagen equivale a unos 30 metros.</p>
         <div class="rp-links">
           <a href="https://www.google.com/maps/@-27.456517,-58.898833,16z/data=!3m1!1e3" target="_blank" rel="noopener">Ver en Google Maps ↗</a>
         </div>
@@ -1247,9 +1247,19 @@ window.rpState = { range: 15, idx: null };
       const medio = st.data[0].fuente_medio || MEDIOS[host] || host;
       const m = fu.match(/\/(20\d\d)\/(\d\d)\/(\d\d)\//);
       const f = st.data[0].fuente_fecha || (m ? `${m[1]}-${m[2]}-${m[3]}` : '');
-      const txt = `APA Chaco, vía ${medio}` + (f ? ` (${window.rpShort(window.rpParse(f))})` : '');
+      const txt = f ? `${window.rpShort(window.rpParse(f))} (${medio})` : medio;
       document.querySelectorAll('.src-apa').forEach((a) => { a.href = fu; a.textContent = txt; });
+      const sp = document.getElementById('src-pron'); const pu = String(st.data[0].pronostico_url || fu);
+      if (sp && /^https:\/\//.test(pu)) sp.href = pu;
     }
+    const cf = String(st.data[0].corrientes_fecha || '').slice(0, 10), ce = document.getElementById('corr-fecha');
+    if (ce) ce.textContent = cf ? ` el ${window.rpShort(window.rpParse(cf))}` : '';
+    const hoyC = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
+    const cc = document.getElementById('corr-cuando'); if (cc) cc.textContent = cf === hoyC ? 'está' : 'estaba';
+    if (ce && cf === hoyC) ce.textContent = ' hoy';
+    // el texto del riesgo dice el estado real de las compuertas, no uno fijo
+    const cr = document.getElementById('riesgo-hoy');
+    if (cr) cr.textContent = /cerrad/i.test(String(st.data[0].compuertas_rio_negro || '')) ? 'Hoy las compuertas están cerradas: por eso importa que el Río Negro no quede mucho más bajo que el Paraná.' : 'Con las compuertas abiertas, como hoy, los dos lados están al mismo nivel y no hay ese empuje.';
     const gt = document.getElementById('gate-tile');
     const g = String(st.data[0].compuertas_rio_negro || '');
     gt.className = 'rp-big rp-gate ' + (/abiert/i.test(g) ? 'open' : /cerrad/i.test(g) ? 'closed' : '');

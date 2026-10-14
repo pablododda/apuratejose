@@ -52,67 +52,77 @@ def agp():
 
 
 def ina():
+    """(Barranqueras, Corrientes) desde el JSON del INA: cada uno (datetime AR, altura) o None."""
+    out = {}
     for e in json.loads(bajar(INA_URL)):
-        if str(e.get("nombre", "")).lower() == "barranqueras" and e.get("valor_actual") is not None:
+        n = str(e.get("nombre", "")).lower()
+        if n in ("barranqueras", "corrientes") and e.get("valor_actual") is not None:
             t = datetime.datetime.strptime(e["fecha_actual"], "%d/%m/%Y %H:%M").replace(tzinfo=AR)
-            return t, round(float(e["valor_actual"]), 2)
-    return None
+            out[n] = (t, round(float(e["valor_actual"]), 2))
+    return out.get("barranqueras"), out.get("corrientes")
 
 
 def main():
     ahora = datetime.datetime.now(AR)
-    lecturas = []
+    lecturas, corr, respondio = [], None, False
     try:
         a = agp()
+        respondio = respondio or a is not None
         if a and ahora - a[0] <= datetime.timedelta(hours=MAX_HORAS):
             lecturas.append((a[0], a[1], "estación del puerto de Barranqueras"))
         print("puerto:", a)
     except Exception as e:
         print("puerto: error", e)
-    if not lecturas:  # el puerto está colgado: Prefectura vía INA
-        try:
-            b = ina()
-            if b:
-                lecturas.append((b[0], b[1], "Prefectura vía INA"))
-            print("INA:", b)
-        except Exception as e:
-            print("INA: error", e)
-    if not lecturas:
+    try:
+        b, corr = ina()
+        respondio = respondio or b is not None
+        if b and not lecturas:  # el puerto está colgado: Prefectura vía INA
+            lecturas.append((b[0], b[1], "Prefectura vía INA"))
+        print("INA:", b, "Corrientes:", corr)
+    except Exception as e:
+        print("INA: error", e)
+    if not respondio:
         print("CAMBIO=0 (ninguna fuente respondió)")
         return
-    t, h, fuente = max(lecturas)
-    fecha, hora = t.strftime("%Y-%m-%d"), t.strftime("%H:%M")
 
+    cambio, msg = False, "revisado sin dato nuevo"
     pp = os.path.join(DATA, "parana_barranqueras.json")
     p = json.load(open(pp, encoding="utf-8"))
-    ult = p[-1]
-    ult_t = datetime.datetime.strptime(ult["fecha"] + " " + (ult.get("hora") or "00:00"), "%Y-%m-%d %H:%M").replace(tzinfo=AR)
-    if t <= ult_t:
-        print("CAMBIO=0 (la última fila ya es igual o más nueva:", ult, ")")
-        return
-    if t - ult_t < datetime.timedelta(days=2) and abs(h - float(ult["altura_m"])) > 0.6:
-        print("CAMBIO=0 (salto sospechoso de", ult["altura_m"], "a", h, "; no se carga)")
-        return
-    fila = {"fecha": fecha, "altura_m": h, "hora": hora, "fuente": fuente}
-    if ult["fecha"] == fecha:
-        p[-1] = fila
-    else:
-        p.append(fila)
-    json.dump(p, open(pp, "w", encoding="utf-8"), ensure_ascii=False)
-
-    fp = os.path.join(DATA, "pronostico.json")
-    pr = json.load(open(fp, encoding="utf-8"))
-    if pr and pr[0].get("tipo") == "ultimo dato":
-        pr[0].update({"fecha": fecha, "min_m": h, "max_m": h})
-        json.dump(pr, open(fp, "w", encoding="utf-8"), ensure_ascii=False)
+    if lecturas:
+        t, h, fuente = max(lecturas)
+        fecha, hora = t.strftime("%Y-%m-%d"), t.strftime("%H:%M")
+        ult = p[-1]
+        ult_t = datetime.datetime.strptime(ult["fecha"] + " " + (ult.get("hora") or "00:00"), "%Y-%m-%d %H:%M").replace(tzinfo=AR)
+        if t <= ult_t:
+            print("la última fila ya es igual o más nueva:", ult)
+        elif t - ult_t < datetime.timedelta(days=2) and abs(h - float(ult["altura_m"])) > 0.6:
+            print("salto sospechoso de", ult["altura_m"], "a", h, "; no se carga")
+        else:
+            fila = {"fecha": fecha, "altura_m": h, "hora": hora, "fuente": fuente}
+            if ult["fecha"] == fecha:
+                p[-1] = fila
+            else:
+                p.append(fila)
+            json.dump(p, open(pp, "w", encoding="utf-8"), ensure_ascii=False)
+            fp = os.path.join(DATA, "pronostico.json")
+            pr = json.load(open(fp, encoding="utf-8"))
+            if pr and pr[0].get("tipo") == "ultimo dato":
+                pr[0].update({"fecha": fecha, "min_m": h, "max_m": h})
+                json.dump(pr, open(fp, "w", encoding="utf-8"), ensure_ascii=False)
+            cambio, msg = True, f"Paraná {h:.2f} m ({fuente}, {fecha} {hora})".replace(".", ",", 1)
 
     sp = os.path.join(DATA, "situacion.json")
     st = json.load(open(sp, encoding="utf-8"))
     if st:
+        # "Revisado" = la última vez que se miraron las fuentes (la página dice aparte de qué hora es la medición)
         st[0]["actualizado"] = ahora.replace(microsecond=0).isoformat()
+        if corr:
+            st[0]["corrientes_m"] = corr[1]
+            st[0]["corrientes_fecha"] = corr[0].strftime("%Y-%m-%d")
         json.dump(st, open(sp, "w", encoding="utf-8"), ensure_ascii=False)
+        cambio = True
 
-    print(f"CAMBIO=1 Paraná {h:.2f} m ({fuente}, {fecha} {hora})".replace(".", ",", 1))
+    print(f"CAMBIO={1 if cambio else 0} {msg}")
 
 
 if __name__ == "__main__":
