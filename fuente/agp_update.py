@@ -114,13 +114,16 @@ def main():
     sp = os.path.join(DATA, "situacion.json")
     st = json.load(open(sp, encoding="utf-8"))
     if st:
-        # "Revisado" = la última vez que se miraron las fuentes (la página dice aparte de qué hora es la medición)
-        st[0]["actualizado"] = ahora.replace(microsecond=0).isoformat()
-        if corr:
+        if corr and (st[0].get("corrientes_m") != corr[1] or st[0].get("corrientes_fecha") != corr[0].strftime("%Y-%m-%d")):
             st[0]["corrientes_m"] = corr[1]
             st[0]["corrientes_fecha"] = corr[0].strftime("%Y-%m-%d")
-        json.dump(st, open(sp, "w", encoding="utf-8"), ensure_ascii=False)
-        cambio = True
+            cambio = True
+            if not msg.startswith("Paraná"):
+                msg = f"Corrientes {corr[1]:.2f} m".replace(".", ",", 1)
+        if cambio:
+            # "Revisado" = la última vez que entró un dato nuevo (el robot mira cada 10 minutos)
+            st[0]["actualizado"] = ahora.replace(microsecond=0).isoformat()
+            json.dump(st, open(sp, "w", encoding="utf-8"), ensure_ascii=False)
 
     print(f"CAMBIO={1 if cambio else 0} {msg}")
 
