@@ -18,14 +18,20 @@ Mirá la hora actual en Argentina (`TZ=America/Argentina/Buenos_Aires date`).
 Si una fuente no responde, dejá ese archivo como está y seguí con el resto.
 
 ### 1. parana_barranqueras.json
-Array `[{fecha:"YYYY-MM-DD", altura_m:number, hora?:"HH:MM"}]` ordenado por fecha.
-- Fuente principal: Prefectura. `curl -sS -m 40 --http1.1 -A "Mozilla/5.0" https://contenidosweb.prefecturanaval.gob.ar/alturas/` y buscá las filas BARRANQUERAS y CORRIENTES (último registro, fecha y hora).
-- Si Prefectura no responde (corta la conexión), probá de nuevo una vez con `curl -sS -m 60 --http1.1 --retry 2 -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15" -H "Accept-Language: es-AR,es" https://contenidosweb.prefecturanaval.gob.ar/alturas/`.
-- Si sigue sin responder, usá SOLO la tabla https://fich.unl.edu.ar/cim/rios/historico/25: cada fila tiene la fecha y la hora REALES de la lectura (la primera fila es la más reciente). NO uses https://fich.unl.edu.ar/cim/rios/parana/alturas para la fecha: esa página muestra la fecha de hoy aunque el dato sea de ayer.
-- Usá la fecha y la hora EXACTAS que la fuente muestra para esa lectura de Barranqueras (Prefectura muestra, por ejemplo, `13/OCT/26 - 0000`: eso es fecha 2026-10-13 y hora "00:00"). Nunca inventes ni copies una hora de otra fila.
-- REGLA IMPORTANTE: solo podés agregar o cambiar la fila de un día si la fuente muestra una lectura de Barranqueras de ESE día. Si la fuente todavía muestra la lectura de ayer (el dato de hoy no se publicó), NO agregues una fila para hoy ni repitas el valor de ayer con fecha de hoy: dejá el archivo como está. La página avisa sola que la medición es de ayer.
-- Si la lectura es más nueva que la última fila (fecha y hora), actualizá la fila de esa fecha o agregá una nueva. Mantené las filas existentes; corregí si la fuente cambió un valor.
-- Si Prefectura y FICH no coinciden en el día, usá la lectura más reciente de las dos (mirando la fecha que muestra cada una).
+Array `[{fecha:"YYYY-MM-DD", altura_m:number, hora?:"HH:MM", fuente?:string}]` ordenado por fecha.
+
+Revisá SIEMPRE las tres fuentes (si una no responde, seguí con las otras) y anotá de cada una la última lectura de Barranqueras con su fecha y hora:
+
+a) Prefectura: `curl -sS -m 40 --http1.1 -A "Mozilla/5.0" https://contenidosweb.prefecturanaval.gob.ar/alturas/` y buscá la fila BARRANQUERAS (y CORRIENTES para situacion.json). Si corta la conexión, probá una vez más con `curl -sS -m 60 --http1.1 --retry 2 -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15" -H "Accept-Language: es-AR,es" https://contenidosweb.prefecturanaval.gob.ar/alturas/`. Muestra, por ejemplo, `13/OCT/26 - 0000`: eso es fecha 2026-10-13 y hora "00:00". `fuente`: "Prefectura".
+b) INA, publicado por Hidráulica de Entre Ríos (datos de la red de Prefectura, en JSON): `curl -sS -m 40 -A "Mozilla/5.0" https://www.hidraulica.gob.ar/ina/ajax.estaciones.json.php` y buscá el objeto con `"nombre": "Barranqueras"`: `valor_actual` es la altura y `fecha_actual` ("13/10/2026 00:00") la fecha y hora. El historial diario está en `https://www.hidraulica.gob.ar/ina/ajax.historico.json.php?series_id=20&dias=10` (`[{ts:"2026-10-13T00:00:00", valor:5.27}]`). `fuente`: "Prefectura vía INA". La página para mirarla a mano es https://www.hidraulica.gob.ar/nivhidr.php
+c) FICH (UNL): la tabla https://fich.unl.edu.ar/cim/rios/historico/25 (la primera fila es la más reciente, con su fecha y hora reales). NO uses https://fich.unl.edu.ar/cim/rios/parana/alturas para la fecha: esa página muestra la fecha de hoy aunque el dato sea de ayer. Si la fila más reciente repite la altura de la anterior con la variación vacía ("—"), es un dato repetido: no la uses. `fuente`: "FICH, UNL".
+
+Cómo elegir:
+- Usá la lectura con la fecha y hora MÁS NUEVAS de las tres (no la altura más alta: cuando el río baje, la más alta va a ser la más vieja).
+- Si dos fuentes tienen lectura del mismo día, preferí Prefectura (a o b) sobre FICH, salvo que la de FICH sea de una hora claramente posterior y no sea un dato repetido.
+- Guardá en la fila la fecha, la hora y la `fuente` EXACTAS de esa lectura. Nunca inventes ni copies una hora de otra fuente. La página muestra la fuente debajo de la altura.
+- REGLA IMPORTANTE: solo podés agregar o cambiar la fila de un día si alguna fuente muestra una lectura de Barranqueras de ESE día. Si todas muestran todavía la de ayer, NO agregues una fila para hoy ni repitas el valor de ayer con fecha de hoy: dejá el archivo como está. La página avisa sola que la medición es de ayer.
+- Si la lectura elegida es más nueva que la última fila (fecha y hora), actualizá la fila de esa fecha o agregá una nueva. Mantené las filas existentes; corregí un día pasado solo si una fuente oficial (a o b) muestra otro valor para ese día.
 - Actualizá también la primera fila de `pronostico.json` (tipo "ultimo dato": fecha, min_m y max_m = esa altura).
 
 ### 2. pronostico.json
@@ -58,4 +64,4 @@ Si no hay acceso a gibs.earthdata.nasa.gov, dejalo como está.
 2. `python3 fuente/armar_sitio.py`
 3. Commit y push directo a `main` (sin ramas ni pull requests), con mensaje tipo "Datos: Paraná 5,19 m (12:00)". GitHub Pages publica solo en un par de minutos.
 
-Al final, resumí en una o dos líneas: altura y hora de la lectura, fuente usada, compuertas, y qué archivos cambiaron.
+Al final, resumí en una o dos líneas: altura y hora de la lectura, qué mostraba cada una de las tres fuentes y cuál usaste, compuertas, y qué archivos cambiaron.
