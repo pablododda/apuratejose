@@ -1,0 +1,38 @@
+name: Altura del Paraná cada hora
+
+on:
+  schedule:
+    - cron: "12 * * * *"   # cada hora, a los 12 minutos (la estación del puerto publica en punto)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: altura-horaria
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Leer la estación y actualizar los datos
+        id: datos
+        run: |
+          out=$(python3 fuente/agp_update.py)
+          echo "$out"
+          linea=$(echo "$out" | grep '^CAMBIO=' | tail -1)
+          echo "cambio=${linea:7:1}" >> "$GITHUB_OUTPUT"
+          echo "msg=${linea:9}" >> "$GITHUB_OUTPUT"
+      - name: Armar la página y publicar
+        if: steps.datos.outputs.cambio == '1'
+        run: |
+          python3 fuente/armar_sitio.py
+          git config user.name "apuratejose-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add fuente/data index.html
+          git commit -m "Datos: ${{ steps.datos.outputs.msg }} (automático)"
+          git pull --rebase origin main
+          git push origin HEAD:main
