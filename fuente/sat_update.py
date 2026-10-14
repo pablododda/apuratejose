@@ -46,7 +46,7 @@ def main():
                 cov, cloud = quality(L, ds)
             except Exception:
                 continue
-            if cov >= 0.97 and cloud <= 0.03:
+            if cov >= 0.97 and cloud <= 0.15:  # hasta 15% de nubes (pedido de Pablo, para que no quede tan desactualizada)
                 jpg = get(L, ds, 900, 696, "image/jpeg")
                 row = {"tipo": "reciente", "fecha": ds, "altura_m": par.get(ds),
                        "img": "data:image/jpeg;base64," + base64.b64encode(jpg).decode()}
