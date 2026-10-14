@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#191917" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Altura del Paraná en Barranqueras, compuertas del Río Negro y pronóstico de lluvia para Resistencia, con datos oficiales.">
 <meta property="og:title" content="Crecida del Paraná y cómo afecta al Río Negro">
-<meta property="og:description" content="Altura del Paraná, compuertas del Río Negro y pronóstico de lluvia, con datos oficiales. Se actualiza cuatro veces por día.">
+<meta property="og:description" content="Altura del Paraná, compuertas del Río Negro y pronóstico de lluvia, con datos oficiales. La altura se actualiza cada hora.">
 <meta property="og:url" content="https://apuratejose.com.ar">
 <meta property="og:type" content="website">
 
@@ -401,7 +401,7 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
   <header class="rp-head" id="inicio">
     <h1>Crecida del Paraná y cómo afecta al Río Negro</h1>
     <div class="rp-fresh" id="fresh" data-source="situacion"><span class="rp-fresh-dot"></span><span>Revisado: <b id="fresh-txt">—</b></span></div>
-    <p class="rp-freshnote">Se revisa automáticamente cuatro veces por día, a las 10, 13, 17 y 21 horas, con datos de fuentes oficiales.</p>
+    <p class="rp-freshnote">La altura del río se actualiza sola cada hora. El pronóstico, las compuertas y la lluvia se revisan a las 10 y a las 20.</p>
   </header>
 
   <section class="rp-tiles" id="hoy">
@@ -471,7 +471,7 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
         <input id="dia" type="range" min="0" max="1000" step="any" value="0" aria-label="Elegí un día o, más a la derecha, simulá que el Paraná sigue subiendo">
       </div>
     </div>
-    <p class="rp-src">Fuentes: <a href="https://fich.unl.edu.ar/cim/rios/historico/25" target="_blank" rel="noopener" title="Prefectura Naval Argentina, vía FICH‑UNL">altura</a> · <a href="https://www.ina.gob.ar/alerta/" target="_blank" rel="noopener" title="Instituto Nacional del Agua (INA)">pronóstico</a> · <a href="https://litigio.com.ar/2026/03/19/piden-a-la-justicia-que-prohiba-a-la-apa-desviar-el-rio-negro-hacia-el-salado/" target="_blank" rel="noopener" title="Manual de Operaciones de la APA (Res. 049/02), citado por Litigio">cierre del dique a 6 m</a> · <a href="https://www.smn.gob.ar/" target="_blank" rel="noopener" title="Servicio Meteorológico Nacional">lluvia</a> · <a href="https://www.meteored.com.ar/tiempo-en_Resistencia-America+Sur-Argentina-Chaco-SARE-1-16890.html" target="_blank" rel="noopener" title="Meteored, estimación no oficial">milímetros</a></p>
+    <p class="rp-src">Fuentes: <a href="https://fich.unl.edu.ar/cim/rios/historico/25" target="_blank" rel="noopener" title="Estación automática del puerto de Barranqueras (cada hora); si no responde, Prefectura Naval, INA o FICH‑UNL">altura</a> · <a href="https://www.ina.gob.ar/alerta/" target="_blank" rel="noopener" title="Instituto Nacional del Agua (INA)">pronóstico</a> · <a href="https://litigio.com.ar/2026/03/19/piden-a-la-justicia-que-prohiba-a-la-apa-desviar-el-rio-negro-hacia-el-salado/" target="_blank" rel="noopener" title="Manual de Operaciones de la APA (Res. 049/02), citado por Litigio">cierre del dique a 6 m</a> · <a href="https://www.smn.gob.ar/" target="_blank" rel="noopener" title="Servicio Meteorológico Nacional">lluvia</a> · <a href="https://www.meteored.com.ar/tiempo-en_Resistencia-America+Sur-Argentina-Chaco-SARE-1-16890.html" target="_blank" rel="noopener" title="Meteored, estimación no oficial">milímetros</a></p>
   </section>
 
 
@@ -571,7 +571,7 @@ dash.calc('resumen', {
   description: 'Última altura, cambio de un día, suba promedio de 7 días y distancia a la alerta.',
   inputs: ['parana_barranqueras', 'umbrales'],
   fn: (parana_barranqueras, umbrales) => {
-    const r = parana_barranqueras.map((d) => ({ fecha: String(d.fecha).slice(0, 10), h: Number(d.altura_m), hora: d.hora ? String(d.hora) : '' })).sort((a, b) => a.fecha < b.fecha ? -1 : 1);
+    const r = parana_barranqueras.map((d) => ({ fecha: String(d.fecha).slice(0, 10), h: Number(d.altura_m), hora: d.hora ? String(d.hora) : '', fuente: d.fuente ? String(d.fuente) : '' })).sort((a, b) => a.fecha < b.fecha ? -1 : 1);
     const last = r[r.length - 1], prev = r[r.length - 2], wk = r[r.length - 8];
     const alerta = Number((umbrales.find((u) => u.tipo === 'alerta') || {}).altura_m);
     const ritmo = (last.h - wk.h) / 7;
@@ -579,6 +579,7 @@ dash.calc('resumen', {
     return [{
       fecha: last.fecha,
       hora: last.hora,
+      fuente: last.fuente,
       altura_m: last.h,
       cambio_dia_cm: Math.round((last.h - prev.h) * 100),
       ritmo_cm_dia: Math.round(ritmo * 100),
@@ -1236,7 +1237,11 @@ window.rpState = { range: 15, idx: null };
       const hoyAR = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
       const fd = String(s.fecha).slice(0, 10), ayer = new Date(Date.parse(hoyAR + 'T12:00:00Z') - 864e5).toISOString().slice(0, 10);
       const dia = window.rpDate.utcFormat('%A %-d')(window.rpParse(fd));
-      med.textContent = fd === hoyAR ? `Medición de hoy, ${dia} (Prefectura)` : fd === ayer ? `Medición de ayer, ${dia}. Hoy todavía no hay dato.` : `Medición del ${dia}`;
+      // la fuente cambia según de dónde salió la lectura más nueva (AGP, Prefectura, INA o FICH)
+      const fu = s.fuente || 'Prefectura';
+      const hm = /^(\d{1,2}):(\d{2})$/.exec(String(s.hora || ''));
+      const hs = hm && !(hm[1] === '00' && hm[2] === '00') ? ` a las ${Number(hm[1])}${hm[2] === '00' ? '' : ':' + hm[2]}` : '';
+      med.textContent = fd === hoyAR ? `Medición de hoy, ${dia}${hs} (${fu})` : fd === ayer ? `Medición de ayer, ${dia} (${fu}). Hoy todavía no hay dato.` : `Medición del ${dia} (${fu})`;
       med.classList.toggle('old', fd !== hoyAR);
     }
     ritmo.textContent = s.ritmo_cm_dia > 0

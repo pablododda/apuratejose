@@ -20,7 +20,7 @@ meta = '''<!doctype html>
 <meta name="theme-color" content="#191917" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Altura del Paraná en Barranqueras, compuertas del Río Negro y pronóstico de lluvia para Resistencia, con datos oficiales.">
 <meta property="og:title" content="Crecida del Paraná y cómo afecta al Río Negro">
-<meta property="og:description" content="Altura del Paraná, compuertas del Río Negro y pronóstico de lluvia, con datos oficiales. Se actualiza cuatro veces por día.">
+<meta property="og:description" content="Altura del Paraná, compuertas del Río Negro y pronóstico de lluvia, con datos oficiales. La altura se actualiza cada hora.">
 <meta property="og:url" content="https://apuratejose.com.ar">
 <meta property="og:type" content="website">
 '''

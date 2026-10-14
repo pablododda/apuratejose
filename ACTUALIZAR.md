@@ -11,9 +11,11 @@ Estructura:
 
 ## Qué hacer en cada corrida
 
+Además de esta rutina, un robot de GitHub Actions (`.github/workflows/altura_horaria.yml` con `fuente/agp_update.py`) actualiza la altura del Paraná CADA HORA desde la estación del puerto de Barranqueras (o Prefectura vía INA si la estación se cuelga). No lo toques. Vos igual revisá el paso 1: si encontrás una lectura más nueva que la última fila, cargala; si no, dejá el archivo como está.
+
 Mirá la hora actual en Argentina (`TZ=America/Argentina/Buenos_Aires date`).
 - Corrida de la mañana (antes de las 12): ACTUALIZACIÓN COMPLETA (pasos 1 a 7).
-- Corridas de mediodía, tarde y noche: ACTUALIZACIÓN LIVIANA (pasos 1, 7 y, si encontrás algo nuevo de la APA sobre compuertas en una búsqueda rápida, el paso 3).
+- Corrida de la noche (20 h): ACTUALIZACIÓN LIVIANA (pasos 1, 7 y, si encontrás algo nuevo de la APA sobre compuertas en una búsqueda rápida, el paso 3).
 
 Si una fuente no responde, dejá ese archivo como está y seguí con el resto.
 
@@ -22,14 +24,14 @@ Array `[{fecha:"YYYY-MM-DD", altura_m:number, hora?:"HH:MM", fuente?:string}]` o
 
 Revisá SIEMPRE las cuatro fuentes (si una no responde, seguí con las otras) y anotá de cada una la última lectura de Barranqueras con su fecha y hora:
 
-0) AGP (Administración General de Puertos), estación automática del puerto de Barranqueras, se actualiza CADA HORA. Es la más nueva casi siempre. Archivo de datos: `curl -sS -m 40 -A "Mozilla/5.0" https://hidrografia2.agpse.gob.ar/histdat/Barranqueras.dat` (CSV; la última línea es la más reciente: `"2026-10-14 10:00:00",5708,4.875006,5.522,0.647`). La altura es la CUARTA columna (`Altura_Avg`, ej. 5.522 → 5.52), NO la tercera (`NIvel_Avg`). Ignorá filas con "NAN". La hora ya está en hora argentina. Página para mirarla a mano: https://hidrografia2.agpse.gob.ar/Barranqueras/marea.html . `fuente`: "AGP, puerto de Barranqueras". Ojo: esta estación marca unos 3 a 5 cm más que Prefectura a la misma hora.
+0) AGP (Administración General de Puertos), estación automática del puerto de Barranqueras, se actualiza CADA HORA. Es la más nueva casi siempre. Archivo de datos: `curl -sS -m 40 -A "Mozilla/5.0" https://hidrografia2.agpse.gob.ar/histdat/Barranqueras.dat` (CSV; la última línea es la más reciente: `"2026-10-14 10:00:00",5708,4.875006,5.522,0.647`). La altura es la CUARTA columna (`Altura_Avg`, ej. 5.522 → 5.52), NO la tercera (`NIvel_Avg`). Ignorá filas con "NAN". La hora ya está en hora argentina. Página para mirarla a mano: https://hidrografia2.agpse.gob.ar/Barranqueras/marea.html . `fuente`: "estación del puerto de Barranqueras". Ojo: esta estación marca unos 3 a 5 cm más que Prefectura a la misma hora.
 a) Prefectura: `curl -sS -m 40 --http1.1 -A "Mozilla/5.0" https://contenidosweb.prefecturanaval.gob.ar/alturas/` y buscá la fila BARRANQUERAS (y CORRIENTES para situacion.json). Si corta la conexión, probá una vez más con `curl -sS -m 60 --http1.1 --retry 2 -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15" -H "Accept-Language: es-AR,es" https://contenidosweb.prefecturanaval.gob.ar/alturas/`. Muestra, por ejemplo, `13/OCT/26 - 0000`: eso es fecha 2026-10-13 y hora "00:00". `fuente`: "Prefectura".
 b) INA, publicado por Hidráulica de Entre Ríos (datos de la red de Prefectura, en JSON): `curl -sS -m 40 -A "Mozilla/5.0" https://www.hidraulica.gob.ar/ina/ajax.estaciones.json.php` y buscá el objeto con `"nombre": "Barranqueras"`: `valor_actual` es la altura y `fecha_actual` ("13/10/2026 00:00") la fecha y hora. El historial diario está en `https://www.hidraulica.gob.ar/ina/ajax.historico.json.php?series_id=20&dias=10` (`[{ts:"2026-10-13T00:00:00", valor:5.27}]`). `fuente`: "Prefectura vía INA". La página para mirarla a mano es https://www.hidraulica.gob.ar/nivhidr.php
 c) FICH (UNL): la tabla https://fich.unl.edu.ar/cim/rios/historico/25 (la primera fila es la más reciente, con su fecha y hora reales). NO uses https://fich.unl.edu.ar/cim/rios/parana/alturas para la fecha: esa página muestra la fecha de hoy aunque el dato sea de ayer. Si la fila más reciente repite la altura de la anterior con la variación vacía ("—"), es un dato repetido: no la uses. `fuente`: "FICH, UNL".
 
 Cómo elegir:
 - Usá la lectura con la fecha y hora MÁS NUEVAS de las cuatro (no la altura más alta: cuando el río baje, la más alta va a ser la más vieja).
-- Si dos fuentes tienen lectura de la misma hora, preferí Prefectura (a o b). Si AGP no responde o su último dato tiene más de 6 horas, usá la más nueva de las otras. Entre FICH y Prefectura del mismo día, preferí Prefectura salvo que la de FICH sea de una hora claramente posterior y no sea un dato repetido.
+- Si dos fuentes tienen lectura de la misma hora, preferí Prefectura (a o b). Si la estación del puerto no responde o su último dato tiene más de 3 horas, usá la más nueva de las otras. Entre FICH y Prefectura del mismo día, preferí Prefectura salvo que la de FICH sea de una hora claramente posterior y no sea un dato repetido.
 - Guardá en la fila la fecha, la hora y la `fuente` EXACTAS de esa lectura. Nunca inventes ni copies una hora de otra fuente. La página muestra la fuente debajo de la altura.
 - REGLA IMPORTANTE: solo podés agregar o cambiar la fila de un día si alguna fuente muestra una lectura de Barranqueras de ESE día. Si todas muestran todavía la de ayer, NO agregues una fila para hoy ni repitas el valor de ayer con fecha de hoy: dejá el archivo como está. La página avisa sola que la medición es de ayer.
 - Si la lectura elegida es más nueva que la última fila (fecha y hora), actualizá la fila de esa fecha o agregá una nueva. Mantené las filas existentes; no cambies días pasados (cada día queda con la última lectura que se tomó ese día), salvo para corregir un error evidente (por ejemplo, una fila con fecha equivocada).
