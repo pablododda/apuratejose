@@ -1002,7 +1002,7 @@ window.rpState = { range: 15, idx: null };
     const when = document.getElementById('dam-when');
     when.className = 'rp-damwhen' + (sim ? ' sim' : '');
     const wtxt = window.rpDate.utcFormat('%a %-d de %B')(near.date);
-    when.textContent = sim ? 'Simulación' : ''; when.style.visibility = sim ? 'visible' : 'hidden'; // la fecha ya está en el gráfico de la izquierda
+    if (when.dataset.sim !== String(!!sim)) { when.dataset.sim = String(!!sim); when.textContent = sim ? 'Simulación' : ''; when.style.visibility = sim ? 'visible' : 'hidden'; } // la fecha ya está en el gráfico de la izquierda
     setBtn();
     dia.value = String(sim && S.sim < hEnd() ? 0 : sim ? L.B + Math.max(0, (S.sim - hEnd()) / Math.max(0.01, DAM_TOP - hEnd())) * (1000 - L.B) : (sx - left) / (W - right - left) * L.B);
     one.classList.toggle('sim', sim);
@@ -1108,10 +1108,14 @@ window.rpState = { range: 15, idx: null };
     // debajo del dique: su estado y qué pasa con la lluvia (los dos textos son de este gráfico)
     const cap = document.getElementById('dam-cap');
     cap.style.top = ((bottom + 8) * sc) + 'px';
+    // solo se reescribe si cambia (antes se reescribía en cada cuadro de la animación)
+    if (cap.dataset.open !== String(open)) {
+    cap.dataset.open = String(open);
     cap.className = 'rp-damcap' + (open ? '' : ' closed');
     cap.innerHTML = open
       ? '<b>Dique abierto.</b> Con las compuertas abiertas, la lluvia tiene salida al Paraná.'
       : '<b>Dique cerrado.</b> Con las compuertas cerradas, la lluvia es lo que más sube el Río Negro: los días marcados abajo son los de mayor riesgo.';
+    }
   }
 
   // ================= tarjeta: qué pasa a esta altura + lluvia =================
@@ -1194,6 +1198,15 @@ window.rpState = { range: 15, idx: null };
     const top = hit[0] ? hit[0].tipo : '';
     so.className = 'rp-simout' + (top === 'evacuacion' ? ' lv-evac' : top === 'alerta' ? ' lv-alerta' : '');
     const [lvl, desc] = message(h, open, U);
+    // la tarjeta se arma una sola vez por mensaje; mientras se mueve la barra solo cambia el número
+    const key = [lvl, desc, so.className].join('|');
+    if (so.dataset.key === key && so.querySelector('.live .mnum')) {
+      const tn = so.querySelector('.live .mnum').firstChild;
+      if (tn && tn.nodeValue !== F2(h)) tn.nodeValue = F2(h);
+      if (so.dataset.open !== String(open)) { so.dataset.open = String(open); drawRain(open); }
+      return;
+    }
+    so.dataset.key = key; so.dataset.open = String(open);
     const live = msgNode(F2(h), lvl, desc);
     // reserva el alto del mensaje más largo para que la tarjeta no salte
     const cands = [];
