@@ -384,7 +384,7 @@
         <input id="dia" type="range" min="0" max="1000" step="any" value="0" aria-label="Elegí un día o, más a la derecha, simulá que el Paraná sigue subiendo">
       </div>
     </div>
-    <p class="rp-src">Fuentes: <a href="https://fich.unl.edu.ar/cim/rios/historico/25" target="_blank" rel="noopener" title="Estación automática del puerto de Barranqueras (cada hora); si no responde, Prefectura Naval, INA o FICH‑UNL">altura</a> · <a href="https://www.ina.gob.ar/alerta/" target="_blank" rel="noopener" title="Instituto Nacional del Agua (INA)">pronóstico</a> · <a href="https://litigio.com.ar/2026/03/19/piden-a-la-justicia-que-prohiba-a-la-apa-desviar-el-rio-negro-hacia-el-salado/" target="_blank" rel="noopener" title="Manual de Operaciones de la APA (Res. 049/02), citado por Litigio">cierre del dique a 6 m</a> · <a href="https://www.smn.gob.ar/" target="_blank" rel="noopener" title="Servicio Meteorológico Nacional">lluvia</a> · <a href="https://www.meteored.com.ar/tiempo-en_Resistencia-America+Sur-Argentina-Chaco-SARE-1-16890.html" target="_blank" rel="noopener" title="Meteored, estimación no oficial">milímetros</a></p>
+    <p class="rp-src">Fuentes: <a id="src-altura" href="https://hidrografia2.agpse.gob.ar/Barranqueras/marea.html" target="_blank" rel="noopener" title="Estación automática del puerto de Barranqueras (cada hora)">altura</a> · <a href="https://www.ina.gob.ar/alerta/" target="_blank" rel="noopener" title="Instituto Nacional del Agua (INA)">pronóstico</a> · <a href="https://litigio.com.ar/2026/03/19/piden-a-la-justicia-que-prohiba-a-la-apa-desviar-el-rio-negro-hacia-el-salado/" target="_blank" rel="noopener" title="Manual de Operaciones de la APA (Res. 049/02), citado por Litigio">cierre del dique a 6 m</a> · <a href="https://www.smn.gob.ar/" target="_blank" rel="noopener" title="Servicio Meteorológico Nacional">lluvia</a> · <a href="https://www.meteored.com.ar/tiempo-en_Resistencia-America+Sur-Argentina-Chaco-SARE-1-16890.html" target="_blank" rel="noopener" title="Meteored, estimación no oficial">milímetros</a></p>
   </section>
 
 
@@ -493,6 +493,8 @@ dash.calc('resumen', {
       fecha: last.fecha,
       hora: last.hora,
       fuente: last.fuente,
+      fecha_ant: prev.fecha,
+      hora_ant: prev.hora,
       altura_m: last.h,
       cambio_dia_cm: Math.round((last.h - prev.h) * 100),
       ritmo_cm_dia: Math.round(ritmo * 100),
@@ -1142,7 +1144,14 @@ window.rpState = { range: 15, idx: null };
     document.querySelector('[data-source="resumen"][data-field="altura_m"]').textContent = F2(s.altura_m);
     document.querySelector('[data-source="resumen"][data-field="falta_alerta_m"]').textContent = F2(s.falta_alerta_m);
     const fecha = window.rpLong(window.rpParse(s.fecha));
-    dDia.textContent = `${s.cambio_dia_cm >= 0 ? '▲' : '▼'} ${window.rpFmtCm(s.cambio_dia_cm)} cm desde ayer`;
+    // hora en formato corto: "11 h", "5:55 h"
+    const fmtH = (hhmm) => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(hhmm || '')); return m ? `${Number(m[1])}${m[2] === '00' ? '' : ':' + m[2]} h` : ''; };
+    // contra qué lectura se compara: la última del día anterior, con su hora (el dato cambia cada hora)
+    const fa = String(s.fecha_ant || '').slice(0, 10), fl = String(s.fecha).slice(0, 10);
+    const esAyer = fa && new Date(Date.parse(fl + 'T12:00:00Z') - 864e5).toISOString().slice(0, 10) === fa;
+    const cuando = !fa ? 'desde ayer' : esAyer ? 'desde ayer' : `desde el ${window.rpDate.utcFormat('%A %-d')(window.rpParse(fa))}`;
+    const hAnt = fmtH(s.hora_ant);
+    dDia.textContent = `${s.cambio_dia_cm >= 0 ? '▲' : '▼'} ${window.rpFmtCm(s.cambio_dia_cm)} cm ${cuando}${hAnt ? ' a las ' + hAnt : ''}`;
     dDia.className = 'rp-delta ' + (s.cambio_dia_cm > 0 ? 'rp-up' : s.cambio_dia_cm < 0 ? 'rp-down' : '');
     // de qué día es la medición (puede no ser de hoy si la fuente todavía no publicó el dato del día)
     const med = document.getElementById('medido');
@@ -1153,8 +1162,24 @@ window.rpState = { range: 15, idx: null };
       // la fuente cambia según de dónde salió la lectura más nueva (AGP, Prefectura, INA o FICH)
       const fu = s.fuente || 'Prefectura';
       const hm = /^(\d{1,2}):(\d{2})$/.exec(String(s.hora || ''));
-      const hs = hm && !(hm[1] === '00' && hm[2] === '00') ? ` a las ${Number(hm[1])}${hm[2] === '00' ? '' : ':' + hm[2]}` : '';
-      med.textContent = fd === hoyAR ? `Medición de hoy, ${dia}${hs} (${fu})` : fd === ayer ? `Medición de ayer, ${dia} (${fu}). Hoy todavía no hay dato.` : `Medición del ${dia} (${fu})`;
+      const hs = hm && !(hm[1] === '00' && hm[2] === '00') ? ` a las ${Number(hm[1])}${hm[2] === '00' ? '' : ':' + hm[2]} h` : '';
+      // cada fuente lleva a su propia página, así lo que se ve acá coincide con lo que muestra el link
+      const SRC_URL = {
+        'estación del puerto de Barranqueras': 'https://hidrografia2.agpse.gob.ar/Barranqueras/marea.html',
+        'AGP, puerto de Barranqueras': 'https://hidrografia2.agpse.gob.ar/Barranqueras/marea.html',
+        'Prefectura': 'https://contenidosweb.prefecturanaval.gob.ar/alturas/',
+        'Prefectura vía INA': 'https://www.hidraulica.gob.ar/nivhidr.php',
+        'FICH, UNL': 'https://fich.unl.edu.ar/cim/rios/historico/25'
+      };
+      const url = SRC_URL[fu] || 'https://contenidosweb.prefecturanaval.gob.ar/alturas/';
+      const a = document.createElement('a');
+      a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = fu;
+      a.style.color = 'inherit'; a.style.textDecoration = 'underline'; a.style.textUnderlineOffset = '2px';
+      const pre = fd === hoyAR ? `Medición de hoy, ${dia}${hs} (` : fd === ayer ? `Medición de ayer, ${dia} (` : `Medición del ${dia} (`;
+      const post = fd === ayer ? '). Hoy todavía no hay dato.' : ')';
+      med.replaceChildren(pre, a, post);
+      const sa = document.getElementById('src-altura');
+      if (sa) { sa.href = url; sa.title = `Fuente de la última altura: ${fu}`; }
       med.classList.toggle('old', fd !== hoyAR);
     }
     ritmo.textContent = s.ritmo_cm_dia > 0
