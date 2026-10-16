@@ -1296,7 +1296,10 @@ window.rpState = { range: 15, idx: null };
     if (ce && cf === hoyC) ce.textContent = ' hoy';
     // el texto del riesgo dice el estado real de las compuertas, no uno fijo
     const cr = document.getElementById('riesgo-hoy');
-    if (cr) cr.textContent = /cerrad/i.test(String(st.data[0].compuertas_rio_negro || '')) ? 'Hoy las compuertas están cerradas: por eso importa que el Río Negro no quede mucho más bajo que el Paraná.' : 'Con las compuertas abiertas, como hoy, los dos lados están al mismo nivel y no hay ese empuje.';
+    const cg = String(st.data[0].compuertas_rio_negro || '');
+    if (cr) cr.textContent = /cerrad/i.test(cg) ? 'Hoy las compuertas están cerradas: por eso importa que el Río Negro no quede mucho más bajo que el Paraná.'
+      : /abiert/i.test(cg) ? 'Con las compuertas abiertas, como hoy, los dos lados están al mismo nivel y no hay ese empuje.'
+      : 'Con el Paraná sobre 6 m, el manual de la APA indica cerrar las compuertas: desde ese momento importa que el Río Negro no quede mucho más bajo que el Paraná.';
     const gt = document.getElementById('gate-tile');
     const g = String(st.data[0].compuertas_rio_negro || '');
     gt.className = 'rp-big rp-gate ' + (/abiert/i.test(g) ? 'open' : /cerrad/i.test(g) ? 'closed' : '');
