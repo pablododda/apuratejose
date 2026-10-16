@@ -120,6 +120,25 @@ def main():
             cambio = True
             if not msg.startswith("Paraná"):
                 msg = f"Corrientes {corr[1]:.2f} m".replace(".", ",", 1)
+        # regla del manual de la APA: con el Paraná en 6 m o más se cierran las compuertas. Si el último informe
+        # de la APA dice "Abiertas" pero es de antes de que el río pasara los 6 m, ese dato ya no vale: "Sin confirmar".
+        try:
+            cierre = 6.0
+            alto = [r for r in p if float(r["altura_m"]) >= cierre]
+            if alto and float(p[-1]["altura_m"]) >= cierre and re.search(r"abiert", str(st[0].get("compuertas_rio_negro", "")), re.I):
+                desde = p[-1]["fecha"]
+                for r in reversed(p):
+                    if float(r["altura_m"]) >= cierre: desde = r["fecha"]
+                    else: break
+                m = re.search(r"/(20\d\d)/(\d\d)/(\d\d)/", str(st[0].get("fuente_url", "")))
+                inf = st[0].get("fuente_fecha") or (f"{m.group(1)}-{m.group(2)}-{m.group(3)}" if m else "")
+                if not inf or inf < desde:
+                    st[0]["compuertas_rio_negro"] = "Sin confirmar"
+                    st[0]["resumen"] = "El Paraná pasó los 6 m: según el manual de la APA, a esa altura se cierran las compuertas. La APA todavía no informó el cierre."
+                    cambio = True
+                    msg = (msg + "; " if msg.startswith("Paraná") else "") + "compuertas sin confirmar (Paraná sobre 6 m)"
+        except Exception as e:
+            print("regla de compuertas: error", e)
         if cambio:
             # "Revisado" = la última vez que entró un dato nuevo (el robot mira cada 10 minutos)
             st[0]["actualizado"] = ahora.replace(microsecond=0).isoformat()

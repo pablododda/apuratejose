@@ -16,6 +16,8 @@
 .rp-up, .rp-down { color: var(--color-fg); }
 .rp-alertcard { border-top: 3px solid var(--color-warn); }
 .rp-alertcard .rp-label { color: var(--color-warn); font-weight: 600; }
+.rp-alertcard.evac { border-top-color: var(--color-bad); }
+.rp-alertcard.evac .rp-label { color: var(--color-bad); }
 .rp-gate.open { color: var(--color-ok); }
 .rp-gate.closed { color: var(--color-warn); }
 .rp-pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: var(--cds-font-size-caption); border: 1px solid var(--color-border-line); margin-top: var(--cds-gap-xs); }
@@ -324,9 +326,10 @@
       <div class="rp-delta" id="delta-dia"></div>
       <div class="rp-medido" id="medido"></div>
     </div>
-    <div class="rp-card rp-alertcard">
-      <div class="rp-label">Le falta subir para el nivel de alerta</div>
-      <div class="rp-big"><span class="dash-skeleton" data-source="resumen" data-field="falta_alerta_m" data-row="0">—</span> <small>metros</small></div>
+    <div class="rp-card rp-alertcard" id="alerta-card">
+      <div class="rp-label" id="alerta-lbl">Le falta subir para el nivel de alerta</div>
+      <div class="rp-big"><span class="dash-skeleton" data-source="resumen" data-field="falta_alerta_m" data-row="0">—</span> <small id="alerta-unid">metros</small></div>
+      <div class="rp-delta" id="alerta-sig"></div>
       <div class="rp-delta" id="ritmo"></div>
     </div>
     <div class="rp-card">
@@ -499,7 +502,9 @@ dash.calc('resumen', {
       cambio_dia_cm: Math.round((last.h - prev.h) * 100),
       ritmo_cm_dia: Math.round(ritmo * 100),
       falta_alerta_m: Math.round(falta * 100) / 100,
-      dias_a_alerta: ritmo > 0 && falta > 0 ? Math.ceil(falta / ritmo) : null
+      dias_a_alerta: ritmo > 0 && falta > 0 ? Math.ceil(falta / ritmo) : null,
+      alerta_m: alerta,
+      evacuacion_m: Number((umbrales.find((u) => u.tipo === 'evacuacion') || {}).altura_m)
     }];
   }
 });
@@ -1155,7 +1160,25 @@ window.rpState = { range: 15, idx: null };
     if (!ok) { dDia.textContent = ''; ritmo.textContent = ''; return; }
     const s = r.data[0];
     document.querySelector('[data-source="resumen"][data-field="altura_m"]').textContent = F2(s.altura_m);
-    document.querySelector('[data-source="resumen"][data-field="falta_alerta_m"]').textContent = F2(s.falta_alerta_m);
+    // tarjeta de alerta: cuánto falta para la alerta o, si ya la pasó, cuánto está por encima y qué nivel sigue
+    const AL = Number(s.alerta_m) || 6, EV = Number(s.evacuacion_m) || 6.5, TOPE = 9.5;
+    const sobre = Math.round((s.altura_m - AL) * 100) / 100, sobreEv = Math.round((s.altura_m - EV) * 100) / 100;
+    const aLbl = document.getElementById('alerta-lbl'), aSig = document.getElementById('alerta-sig'), aCard = document.getElementById('alerta-card');
+    const aVal = document.querySelector('[data-source="resumen"][data-field="falta_alerta_m"]');
+    if (sobreEv >= 0) {
+      aLbl.textContent = `Pasó el nivel de evacuación (${F2(EV)} m)`;
+      aVal.textContent = `+${F2(sobreEv)}`;
+      aSig.textContent = `Le faltan ${F2(TOPE - s.altura_m)} m para el tope del dique (${F2(TOPE)} m)`;
+    } else if (sobre >= 0) {
+      aLbl.textContent = `Pasó el nivel de alerta (${F2(AL)} m)`;
+      aVal.textContent = `+${F2(sobre)}`;
+      aSig.textContent = `Le faltan ${F2(EV - s.altura_m)} m para el nivel de evacuación (${F2(EV)} m)`;
+    } else {
+      aLbl.textContent = 'Le falta subir para el nivel de alerta';
+      aVal.textContent = F2(s.falta_alerta_m);
+      aSig.textContent = '';
+    }
+    if (aCard) aCard.classList.toggle('evac', sobreEv >= 0);
     const fecha = window.rpLong(window.rpParse(s.fecha));
     // hora en formato corto: "11 h", "5:55 h"
     const fmtH = (hhmm) => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(hhmm || '')); return m ? `${Number(m[1])}${m[2] === '00' ? '' : ':' + m[2]} h` : ''; };
@@ -1204,7 +1227,8 @@ window.rpState = { range: 15, idx: null };
     const dir = s.ritmo_cm_dia > 0 ? 'y sigue subiendo' : s.ritmo_cm_dia < 0 ? 'y está bajando' : 'y se mantiene';
     const b1 = document.createElement('b'); b1.textContent = `${F2(s.altura_m)} m`;
     const b2 = document.createElement('b'); b2.textContent = `${F2(s.falta_alerta_m)} m`;
-    take.append('Hoy el Paraná está en ', b1, ` en Barranqueras ${dir}. Faltan `, b2, ' para el nivel de alerta.');
+    if (s.altura_m >= (Number(s.alerta_m) || 6)) take.append('Hoy el Paraná está en ', b1, ` en Barranqueras ${dir}, por encima del nivel de alerta.`);
+    else take.append('Hoy el Paraná está en ', b1, ` en Barranqueras ${dir}. Faltan `, b2, ' para el nivel de alerta.');
     }
 
     // escalera de niveles
