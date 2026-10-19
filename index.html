@@ -375,6 +375,14 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
 @keyframes rp-flow { to { stroke-dashoffset: -24; } }
 @media (prefers-reduced-motion: no-preference) { .rp-spin { animation: rp-spin 1.2s linear infinite; } }
 @keyframes rp-spin { to { transform: rotate(360deg); } }
+.rp-drop { opacity: .7; }
+@media (prefers-reduced-motion: no-preference) { .rp-drop { animation: rp-fall 1.1s linear infinite; } }
+@keyframes rp-fall { 0% { transform: translate(0, -14px); opacity: 0; } 25% { opacity: .8; } 100% { transform: translate(-5px, 16px); opacity: 0; } }
+/* las bombas no andan siempre. Sin lluvia hoy: bomba quieta y puntitos grises que solo muestran hacia dónde iría el agua (sin chorro al Paraná).
+   Con lluvia en el pronóstico de hoy: agua azul, bomba girando y chorro. */
+.rp-idle .rp-flow { stroke: var(--color-fg-muted); stroke-width: 2.5; stroke-dasharray: 2 6; stroke-linecap: round; }
+.rp-idle .rp-jet { display: none; }
+.rp-idle .rp-spin { animation: none; }
 .rp-simout.lv-alerta { border-left-color: var(--color-warn); }
 .rp-simout.lv-evac { border-left-color: var(--color-bad); }
 .rp-simout b { font-weight: 600; }
@@ -467,7 +475,7 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
         <div class="rp-rain dim" id="lluvia" data-source="lluvia">
           <div class="rp-raindays" id="rain-days"></div>
         </div>
-        <p class="rp-note rp-damnote"><b>Dique regulador del Río Negro</b>, en Barranqueras. Forma parte de las defensas de la ciudad, pensadas para aguantar hasta 9,50 m. <a href="https://www.youtube.com/watch?v=kfi0U468nVk" target="_blank" rel="noopener" id="dron-link">▶ Verlo desde un dron</a></p>
+        <p class="rp-note rp-damnote"><b>Dique regulador del Río Negro</b>, en Barranqueras. Forma parte de las defensas de la ciudad, pensadas para aguantar hasta 9,50 m. Tiene 14 bombas que, entre todas, sacan hasta 70 m³ de agua por segundo: una pileta olímpica cada 36 segundos (<a href="https://www.diariolavozdelchaco.com/2026/10/19/el-parana-alcanzo-los-7-metros-y-podria-llegar-a-730-en-los-proximos-dias/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">APA, 19 oct</a>). <a href="https://www.youtube.com/watch?v=kfi0U468nVk" target="_blank" rel="noopener" id="dron-link">▶ Verlo desde un dron</a></p>
         <dialog class="rp-video" id="dron">
           <div class="rp-videohead"><span>Dique regulador del Río Negro, desde un dron</span><button type="button" id="dron-x" aria-label="Cerrar">✕</button></div>
           <div class="rp-videobox" id="dron-box"></div>
@@ -959,14 +967,14 @@ window.rpState = { range: 15, idx: null };
     };
     mask('rp-m-rn', [[0, 0], [.6, .3], [1, 1]]);
     mask('rp-m-pa', [[0, 1], [.6, .7], [1, 0]]);
-    const gBg = svg.append('g'), gWater = svg.append('g'), gLines = svg.append('g'), gDyn = svg.append('g'), gFlow = svg.append('g'), gPump = svg.append('g'), gGate = svg.append('g');
+    const gBg = svg.append('g'), gWater = svg.append('g'), gLines = svg.append('g'), gDyn = svg.append('g'), gFlow = svg.append('g'), gPump = svg.append('g').attr('class', 'rp-idle'), gRain = svg.append('g'), gGate = svg.append('g');
     gBg.append('line').attr('x1', 0).attr('x2', W).attr('y1', bottom).attr('y2', bottom).attr('stroke', 'var(--cds-chart-axis)');
     const { U } = gateRule();
     U.filter((u) => (u.tipo === 'alerta' || u.tipo === 'evacuacion') && u.altura_m >= yDom[0]).forEach((u) => {
       const col = u.tipo === 'evacuacion' ? 'var(--color-bad)' : 'var(--color-warn)';
       gLines.append('line').attr('x1', 0).attr('x2', W).attr('y1', y(u.altura_m)).attr('y2', y(u.altura_m)).attr('stroke', col).attr('stroke-width', 1.5).attr('stroke-dasharray', u.tipo === 'evacuacion' ? null : '6 4');
     });
-    D = { svg, gWater, gDyn, gFlow, gPump, gGate, y, W, H, bottom, damL, damR, narrow, side: !!side, off, fresh: true, prevOpen: D ? D.prevOpen : undefined };
+    D = { svg, gWater, gDyn, gFlow, gPump, gRain, gGate, y, W, H, bottom, damL, damR, narrow, side: !!side, off, fresh: true, prevOpen: D ? D.prevOpen : undefined };
   }
 
   // ================= actualizar todo según el estado =================
@@ -1022,7 +1030,7 @@ window.rpState = { range: 15, idx: null };
   }
 
   function drawDamState(h, open, cierre) {
-    const { gWater, gDyn, gFlow, gPump, gGate, y, W, H, bottom, damL, damR, narrow } = D;
+    const { gWater, gDyn, gFlow, gPump, gRain, gGate, y, W, H, bottom, damL, damR, narrow } = D;
     const blue = dash.colors[0];
     gWater.selectAll('*').remove(); gDyn.selectAll('*').remove();
     const sy = y(h);
@@ -1071,13 +1079,24 @@ window.rpState = { range: 15, idx: null };
     D.prevOpen = open; D.fresh = false;
     gDyn.append('line').attr('x1', 0).attr('x2', W).attr('y1', damTop).attr('y2', damTop).attr('stroke', 'var(--color-fg-muted)').attr('stroke-width', 1.2).attr('stroke-dasharray', '2 3');
     lab(gDyn, narrow ? 'tope 9,5 m' : 'tope del dique 9,5 m', W - 2, damTop - 5, 'end', false, 'var(--color-fg-muted)', 10);
+    // la bomba se anima solo con las compuertas cerradas y lluvia en el pronóstico de hoy (se prende cuando hace falta)
+    const llueve = lluviaHoy();
+    gPump.classed('rp-idle', open || !llueve);
+    gRain.style('display', llueve ? null : 'none');
     // la bomba y la corriente se dibujan una sola vez (si se redibujaran en cada paso, sus animaciones quedarían congeladas)
     const pumpKey = [W, bottom, damTop, open ? 'abierto' : Math.round(ry), narrow, damL].join('|');
     const px = damR + (narrow ? 20 : 24), pipeTop = damTop - 26;
     const endX = damL - (narrow ? 18 : 26), endY = pipeTop + (narrow ? 18 : 30);
     if (D.pumpKey !== pumpKey || !gPump.node().firstChild) {
       D.pumpKey = pumpKey;
-      gFlow.selectAll('*').remove(); gPump.selectAll('*').remove();
+      gFlow.selectAll('*').remove(); gPump.selectAll('*').remove(); gRain.selectAll('*').remove();
+      // lluvia sobre el Río Negro (se ve solo si el pronóstico de hoy trae lluvia)
+      const rx0 = damR + (narrow ? 34 : 60), rx1 = W - (narrow ? 66 : 24), ryTop = narrow ? damTop - 16 : damTop + 6, labY = Math.max(pipeTop + 34, ry - 30) - 8, nGotas = narrow ? 9 : 14;
+      for (let i = 0; i < nGotas; i++) {
+        const x = rx0 + (rx1 - rx0) * ((0.5 + i * 0.7549) % 1), y = ryTop + (Math.max(14, labY - 22 - ryTop) * ((0.5 + i * 0.5698) % 1));
+        gRain.append('line').attr('class', 'rp-drop').attr('x1', x).attr('y1', y).attr('x2', x - 3).attr('y2', y + 9)
+          .attr('stroke', blue).attr('stroke-width', 2).attr('stroke-linecap', 'round').style('animation-delay', `${-(i * 0.37) % 1.1}s`);
+      }
       // abierta: el Río Negro desagota al Paraná por debajo
       const ay = bottom - gapH / 2;
       gFlow.append('path').attr('d', `M${damR + 14},${ay} L${damL - 8},${ay}`).attr('stroke', 'var(--rp-rn)').attr('stroke-width', 2.5).attr('stroke-dasharray', '6 6').attr('class', 'rp-flow');
@@ -1098,7 +1117,7 @@ window.rpState = { range: 15, idx: null };
       const rot = gPump.append('g').attr('transform', `translate(${px},${pcy})`).append('g').attr('class', 'rp-spin');
       [0, 120, 240].forEach((a) => rot.append('path').attr('d', `M0,0 L${pr * 0.62},${-pr * 0.18}`).attr('transform', `rotate(${a})`).attr('stroke', 'var(--color-panel)').attr('stroke-width', 2.5).attr('stroke-linecap', 'round'));
       rot.append('circle').attr('r', 2.5).attr('fill', 'var(--color-panel)');
-      lab(gPump, 'bomba', inX + 8, pcy + 4, 'start', true, null, narrow ? 10 : 11);
+      lab(gPump, 'bombas', inX + 8, pcy + 4, 'start', true, null, narrow ? 10 : 11);
       for (let k = -1; k <= 1; k++) {
         gPump.append('line').attr('class', 'rp-flow rp-jet').attr('data-k', k).attr('x1', endX + k * 3).attr('y1', endY + 4).attr('x2', endX + k * 6)
           .attr('stroke', blue).attr('stroke-width', 2.5).attr('stroke-linecap', 'round').attr('stroke-dasharray', '3 4');
@@ -1127,6 +1146,12 @@ window.rpState = { range: 15, idx: null };
     }
   }
 
+  // ¿el pronóstico de hoy trae lluvia (posible o fuerte)?
+  function lluviaHoy() {
+    const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
+    const r = rainRows().find((x) => String(x.fecha).slice(0, 10) === hoy);
+    return !!r && Number(r.nivel) >= 1;
+  }
   // ¿hay algún pronóstico con fecha de hoy en adelante? (si no, no se muestra como vigente)
   function pronoFuturo() {
     const f = dash.data('pronostico'); if (f.status !== 'ok') return false;
@@ -1138,13 +1163,15 @@ window.rpState = { range: 15, idx: null };
   function damCaption(open) {
     if (open) return '<b>Con el dique abierto</b>, la lluvia tiene salida al Paraná.';
     const rows = rainRows().map((r) => ({ ...r, nivel: Number(r.nivel) }));
-    const dia = (r) => window.rpDate.utcFormat('%A %-d')(window.rpParse(r.fecha));
-    const lista = (rs) => rs.length === 1 ? dia(rs[0]) : rs.slice(0, -1).map(dia).join(', el ') + ' y el ' + dia(rs[rs.length - 1]);
+    const hoyC = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
+    // "hoy" o "el martes 20"
+    const dia = (r, art) => String(r.fecha).slice(0, 10) === hoyC ? 'hoy' : (art ? 'el ' : '') + window.rpDate.utcFormat('%A %-d')(window.rpParse(r.fecha));
+    const lista = (rs, art) => rs.length === 1 ? dia(rs[0], art) : rs.slice(0, -1).map((r) => dia(r, art)).join(', ') + ' y ' + dia(rs[rs.length - 1], art);
     const fuertes = rows.filter((r) => r.nivel >= 2), posibles = rows.filter((r) => r.nivel === 1);
-    const pre = '<b>Con el dique cerrado</b>, la lluvia es lo que más sube el Río Negro';
+    const pre = '<b>Con el dique cerrado</b>, las bombas se prenden solo si la lluvia hace subir el Río Negro';
     if (!rows.length) return pre + '.';
-    if (fuertes.length) return pre + `: ${fuertes.length === 1 ? 'el día marcado abajo es el' : 'los días marcados abajo son los'} de más riesgo (${lista(fuertes)}).`;
-    if (posibles.length) return pre + `. Por ahora no se esperan tormentas fuertes, solo lluvia posible el ${lista(posibles)}.`;
+    if (fuertes.length) return pre + `: ${lista(fuertes, true)} ${fuertes.length === 1 ? 'es el día de más riesgo, marcado abajo' : 'son los días de más riesgo, marcados abajo'}.`;
+    if (posibles.length) return pre + `. Por ahora no se esperan tormentas fuertes, solo lluvia posible ${lista(posibles, true)}.`;
     return pre + '. Por ahora no se espera lluvia en los próximos días.';
   }
   // ================= tarjeta: qué pasa a esta altura + lluvia =================
