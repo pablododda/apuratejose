@@ -78,7 +78,12 @@ def actualizar(sat_path, par_path):
             par = {r["fecha"]: r["altura_m"] for r in json.load(open(par_path, encoding="utf-8"))}
             row = {"tipo": "reciente", "fecha": fecha, "altura_m": par.get(fecha), "nubes_pct": round(nub * 100),
                    "satelite": "Sentinel-2", "img": "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()}
-            sat = [r for r in sat if r.get("tipo") != "reciente"] + [row]
+            # la que era "reciente" pasa a ser la de "antes": así se comparan dos pasadas seguidas, no una vieja
+            prev = next((r for r in sat if r.get("tipo") == "reciente"), None)
+            if prev:
+                sat = [dict(prev, tipo="antes")] + [row]
+            else:
+                sat = [r for r in sat if r.get("tipo") != "reciente"] + [row]
             json.dump(sat, open(sat_path, "w", encoding="utf-8"), ensure_ascii=False)
             return f"imagen satelital del {fecha} ({round(nub * 100)}% de nubes)"
         except Exception as e:

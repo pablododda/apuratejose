@@ -438,9 +438,9 @@
     <div class="rp-duo">
       <div class="rp-duo-a">
         <h2>Norte de Resistencia desde el satélite</h2>
-        <p class="rp-note">Arrastrá la línea sobre la imagen para comparar antes de la crecida con la imagen más reciente en la que se ve el dique.</p>
+        <p class="rp-note">Arrastrá la línea sobre la imagen para comparar la imagen anterior con la más reciente en la que se ve el dique.</p>
         <div class="rp-satbox" id="sat" data-source="satelite">
-          <img class="rp-satimg" draggable="false" id="sat-antes" alt="Imagen satelital antes de la crecida">
+          <img class="rp-satimg" draggable="false" id="sat-antes" alt="Imagen satelital anterior">
           <img class="rp-satimg rp-sattop" draggable="false" id="sat-ahora" alt="Imagen satelital más reciente">
           <div class="rp-satline" id="sat-line"></div>
           <div class="rp-sathandle" id="sat-handle" aria-hidden="true">‹ ›</div>
@@ -455,7 +455,7 @@
       <div class="rp-duo-b">
         <h2>Qué mirar en esta zona</h2>
         <p class="rp-text">El punto rojo marca el <b>dique regulador</b>, donde el Río Negro desemboca en el Paraná (el agua marrón, abajo a la derecha). El <b>Río Negro</b> es la línea verde que serpentea por el norte de la ciudad: con las <b>compuertas cerradas y mucha lluvia</b>, es el que puede subir.</p>
-        <p class="rp-note">Los satélites pasan por acá cada 2 a 5 días, siempre a media mañana. Si ese día el dique está tapado por nubes, la imagen no sirve y se espera a la pasada siguiente: por eso, en semanas de lluvia, la imagen puede tener varios días de atraso. La de antes queda fija, para comparar. Cada punto de la imagen equivale a entre 10 y 30 metros.</p>
+        <p class="rp-note">Los satélites pasan por acá cada 2 a 5 días, siempre a media mañana. Si ese día el dique está tapado por nubes, la imagen no sirve y se espera a la pasada siguiente: por eso, en semanas de lluvia, la imagen puede tener varios días de atraso. Cuando llega una imagen nueva, la anterior pasa a la izquierda para comparar. Cada punto de la imagen equivale a entre 10 y 30 metros.</p>
         <div class="rp-links">
           <a href="https://www.google.com/maps/@-27.456517,-58.898833,16z/data=!3m1!1e3" target="_blank" rel="noopener">Ver en Google Maps ↗</a>
         </div>
@@ -1345,7 +1345,7 @@ window.rpState = { range: 15, idx: null };
     const a = s.data.find((r) => r.tipo === 'antes'), b = s.data.find((r) => r.tipo === 'reciente');
     if (a && okImg(a.img) && document.getElementById('sat-antes').src !== a.img) document.getElementById('sat-antes').src = a.img;
     if (b && okImg(b.img) && top.src !== b.img) top.src = b.img;
-    document.getElementById('sat-lab-a').textContent = a ? lab(a, 'Antes') : '';
+    document.getElementById('sat-lab-a').textContent = a ? lab(a, 'Anterior') : '';
     document.getElementById('sat-lab-b').textContent = b ? lab(b, 'Reciente') : '';
     setPos();
   });
