@@ -1819,9 +1819,20 @@ window.rpState = { range: 15, idx: null };
   window.addEventListener('resize', () => { const el = document.getElementById('corte'); if (el && el.clientWidth !== corteW) { corteW = el.clientWidth; drawCorte(); } });
 </script>
 
-<!-- Medición de visitas: Cloudflare Web Analytics y Microsoft Clarity -->
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "03fb9fda78224ad78a769bdea79804a2"}'></script>
-<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","yx6ja2m1y4");
+<!-- Medición de visitas: Cloudflare Web Analytics y Microsoft Clarity.
+     Solo se cargan en los dominios de apuratejose: una copia del proyecto en otro dominio no manda datos a estas cuentas,
+     y la vista previa tampoco (así las pruebas no se mezclan con las visitas reales).
+     Si copiás este proyecto, poné tus dominios y tus códigos acá. -->
+<script>
+(() => {
+  const DOMINIOS = ['apuratejose.com.ar', 'www.apuratejose.com.ar', 'apuratejose.pages.dev'];
+  if (!DOMINIOS.includes(location.hostname)) return;
+  const cf = document.createElement('script'); cf.defer = true; cf.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+  cf.setAttribute('data-cf-beacon', '{"token": "03fb9fda78224ad78a769bdea79804a2"}'); document.head.appendChild(cf);
+  (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","yx6ja2m1y4");
+})();
+</script>
+<script>
 // ================= compartir =================
 // El texto sale de los mismos datos que muestra la página, así nunca dice algo distinto
 (() => {
