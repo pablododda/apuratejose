@@ -18,7 +18,11 @@ def _rasterio():
     try:
         import rasterio  # noqa
     except ImportError:
-        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "rasterio", "pillow"], check=True)
+        import importlib, site
+        r = subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--user", "--break-system-packages", "rasterio", "pillow", "numpy"], capture_output=True, text=True)
+        print("pip:", r.returncode, r.stderr[-300:])
+        site.addsitedir(site.getusersitepackages())
+        importlib.invalidate_caches()
     import rasterio
     return rasterio
 
