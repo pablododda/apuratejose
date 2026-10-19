@@ -106,6 +106,7 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
 .rp-alertcard.evac { border-top-color: var(--color-bad); }
 .rp-gaterev { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 2px 0 0; }
 .rp-gaterev.old { color: var(--color-warn); }
+.rp-gate .gate-pre { display: block; font-family: var(--font-anthropic-sans); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.2; }
 .rp-alertcard.evac .rp-label { color: var(--color-bad); }
 .rp-gate.open { color: var(--color-ok); }
 .rp-gate.closed { color: var(--color-warn); }
@@ -1121,8 +1122,8 @@ window.rpState = { range: 15, idx: null };
     cap.dataset.open = String(open);
     cap.className = 'rp-damcap' + (open ? '' : ' closed');
     cap.innerHTML = open
-      ? '<b>Dique abierto.</b> Con las compuertas abiertas, la lluvia tiene salida al Paraná.'
-      : '<b>Dique cerrado.</b> Con las compuertas cerradas, la lluvia es lo que más sube el Río Negro: los días marcados abajo son los de mayor riesgo.';
+      ? '<b>Con el dique abierto</b>, la lluvia tiene salida al Paraná.'
+      : '<b>Con el dique cerrado</b>, la lluvia es lo que más sube el Río Negro: los días marcados abajo son los de mayor riesgo.';
     }
   }
 
@@ -1185,11 +1186,11 @@ window.rpState = { range: 15, idx: null };
     const hit = U.filter((u) => h >= u.altura_m).sort((a, b) => b.altura_m - a.altura_m);
     const top = hit[0];
     if (h >= DAM_TOP - 0.005) return ['Tope del dique', 'El Paraná llega al tope del dique y de las defensas de la ciudad.'];
-    if (!top) return ['Sin aviso', `Las compuertas del Río Negro están ${open ? 'abiertas' : 'cerradas'}.`];
-    if (top.tipo === 'evacuacion') return ['Evacuación', open ? 'El Paraná llega al nivel de evacuación.' : 'Las compuertas siguen cerradas y, si llueve mucho y las bombas no dan abasto, el Río Negro sube.'];
+    if (!top) return ['Sin aviso', `Por protocolo, las compuertas del Río Negro van ${open ? 'abiertas' : 'cerradas'}.`];
+    if (top.tipo === 'evacuacion') return ['Evacuación', open ? 'El Paraná llega al nivel de evacuación.' : 'Con las compuertas cerradas, si llueve mucho y las bombas no dan abasto, el Río Negro sube.'];
     if (top.tipo === 'alerta') return ['Alerta', open ? 'Por protocolo, la APA puede cerrar las compuertas del Río Negro.' : 'Por protocolo, la APA cierra las compuertas del Río Negro, y es el momento de más riesgo porque, si llueve mucho y las bombas no dan abasto, el río sube.'];
     const n = /^extremar/i.test(top.nombre) ? 'Hay que ' + top.nombre.charAt(0).toLowerCase() + top.nombre.slice(1) : top.nombre;
-    return ['Aviso', `${n}, y las compuertas siguen ${open ? 'abiertas' : 'cerradas'}.`];
+    return ['Aviso', `${n}; por protocolo, las compuertas siguen ${open ? 'abiertas' : 'cerradas'}.`];
   }
   const msgNode = (hTxt, lvl, desc) => {
     const w = document.createElement('span'); w.className = 'live';
@@ -1387,7 +1388,9 @@ window.rpState = { range: 15, idx: null };
     // el texto del riesgo dice el estado real de las compuertas, no uno fijo
     const cr = document.getElementById('riesgo-hoy');
     const cg = String(st.data[0].compuertas_rio_negro || '');
-    if (cr) cr.textContent = /cerrad/i.test(cg) ? 'Hoy las compuertas están cerradas: por eso importa que el Río Negro no quede mucho más bajo que el Paraná.'
+    const cman = String(st.data[0].compuertas_base || '') === 'manual';
+    if (cr) cr.textContent = /cerrad/i.test(cg) && cman ? 'Con el Paraná sobre 6 m, el protocolo de la APA indica cerrar las compuertas: desde ese momento importa que el Río Negro no quede mucho más bajo que el Paraná.'
+      : /cerrad/i.test(cg) ? 'Hoy las compuertas están cerradas: por eso importa que el Río Negro no quede mucho más bajo que el Paraná.'
       : /abiert/i.test(cg) ? 'Con las compuertas abiertas, como hoy, los dos lados están al mismo nivel y no hay ese empuje.'
       : 'Con el Paraná sobre 6 m, el manual de la APA indica cerrar las compuertas: desde ese momento importa que el Río Negro no quede mucho más bajo que el Paraná.';
     // las compuertas se revisan todos los días: se muestra el día de la última revisión (no solo la fecha del informe de la APA)
@@ -1396,13 +1399,22 @@ window.rpState = { range: 15, idx: null };
       const hoyG = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
       const rv = String(st.data[0].compuertas_revisado || '').slice(0, 10);
       // si la APA no lo anunció, el estado sale de su manual de operación (cierre con el Paraná en 6 m)
-      const base = String(st.data[0].compuertas_base || '') === 'manual' ? 'Según el manual de la APA (se cierran con el Paraná en 6 m). ' : 'Informado por la APA. ';
+      const gtxt = String(st.data[0].compuertas_rio_negro || '');
+      const base = String(st.data[0].compuertas_base || '') === 'manual'
+        ? (/cerrad/i.test(gtxt) ? 'Por protocolo de la APA, con el Paraná sobre 6 m. La APA todavía no lo anunció. ' : 'Por protocolo de la APA, con el Paraná debajo de 6 m. La APA todavía no lo anunció. ')
+        : 'Informado por la APA. ';
       gr.textContent = base + (!rv ? '' : rv === hoyG ? `Revisado hoy, ${window.rpShort(window.rpParse(rv))}.` : `Revisado por última vez el ${window.rpShort(window.rpParse(rv))}. Hoy todavía no se revisó.`);
       gr.classList.toggle('old', !!rv && rv !== hoyG);
     }
     const gt = document.getElementById('gate-tile');
     const g = String(st.data[0].compuertas_rio_negro || '');
     gt.className = 'rp-big rp-gate ' + (/abiert/i.test(g) ? 'open' : /cerrad/i.test(g) ? 'closed' : '');
+    // sin anuncio de la APA no se afirma el estado: se dice lo que indica su protocolo
+    const manual = String(st.data[0].compuertas_base || '') === 'manual';
+    const gs = gt.querySelector('[data-field="compuertas_rio_negro"]');
+    if (gs && manual && /abiert|cerrad/i.test(g)) {
+      gs.replaceChildren(Object.assign(document.createElement('small'), { className: 'gate-pre', textContent: 'Deberían estar' }), document.createTextNode(/abiert/i.test(g) ? 'abiertas' : 'cerradas'));
+    }
     const f = document.querySelector('.rp-foot [data-field="fecha"]');
     if (f) f.textContent = String(st.data[0].fecha).slice(0, 10);
   });
