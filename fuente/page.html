@@ -361,7 +361,8 @@
         <div class="rp-pof" id="pronostico">
           <h3 class="rp-rainh">Pronóstico oficial</h3>
           <p class="rp-text"><span data-source="situacion" data-field="pronostico_texto" data-row="0">—</span></p>
-          <p class="rp-note">Corrientes, río arriba, <span id="corr-cuando">estaba</span> en <span data-source="situacion" data-field="corrientes_m" data-row="0">—</span> m<span id="corr-fecha"></span> (<a href="https://www.hidraulica.gob.ar/nivhidr.php" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Prefectura vía INA</a>). Lo que sube allá suele verse en Barranqueras poco después.</p>
+          <p class="rp-note" id="prono-viejo" hidden>Las fechas de este pronóstico ya pasaron y todavía no salió uno nuevo.</p>
+          <p class="rp-note">Corrientes, río arriba, <span id="corr-cuando">estaba</span> en <span data-source="situacion" data-field="corrientes_m" data-row="0">—</span> m<span id="corr-fecha"></span> (<a href="https://www.hidraulica.gob.ar/nivhidr.php" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Prefectura vía INA</a>). Lo que pasa allá suele verse en Barranqueras poco después.</p>
         </div>
       </div>
       <div class="rp-split-b">
@@ -799,7 +800,7 @@ window.rpState = { range: 15, idx: null };
       flowX += 24 + tw + 16;
     };
     leg('Medido', dash.colors[0], null);
-    leg('Pronóstico', dash.colors[0], '4 4');
+    if (pronoFuturo()) leg('Pronóstico', dash.colors[0], '4 4');
     gBg.append('line').attr('x1', left).attr('x2', W - right).attr('y1', bottom).attr('y2', bottom).attr('stroke', 'var(--cds-chart-axis)');
 
     // alerta y evacuación
@@ -1031,30 +1032,51 @@ window.rpState = { range: 15, idx: null };
     const cap = document.getElementById('dam-cap');
     cap.style.top = ((bottom + 8) * sc) + 'px';
     // solo se reescribe si cambia (antes se reescribía en cada cuadro de la animación)
-    if (cap.dataset.open !== String(open)) {
-    cap.dataset.open = String(open);
+    const capTxt = damCaption(open);
+    if (cap.dataset.txt !== capTxt) {
+    cap.dataset.txt = capTxt;
     cap.className = 'rp-damcap' + (open ? '' : ' closed');
-    cap.innerHTML = open
-      ? '<b>Con el dique abierto</b>, la lluvia tiene salida al Paraná.'
-      : '<b>Con el dique cerrado</b>, la lluvia es lo que más sube el Río Negro: los días marcados abajo son los de mayor riesgo.';
+    cap.innerHTML = capTxt;
     }
   }
 
+  // ¿hay algún pronóstico con fecha de hoy en adelante? (si no, no se muestra como vigente)
+  function pronoFuturo() {
+    const f = dash.data('pronostico'); if (f.status !== 'ok') return false;
+    const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
+    return f.data.some((r) => r.tipo !== 'ultimo dato' && String(r.fecha).slice(0, 10) >= hoy);
+  }
+  dash.onData(() => { const n = document.getElementById('prono-viejo'); if (n && dash.data('pronostico').status === 'ok') n.hidden = pronoFuturo(); });
+  // texto debajo del dique: depende de las compuertas Y de la lluvia que se espera (nunca habla de días marcados si no hay)
+  function damCaption(open) {
+    if (open) return '<b>Con el dique abierto</b>, la lluvia tiene salida al Paraná.';
+    const rows = rainRows().map((r) => ({ ...r, nivel: Number(r.nivel) }));
+    const dia = (r) => window.rpDate.utcFormat('%A %-d')(window.rpParse(r.fecha));
+    const lista = (rs) => rs.length === 1 ? dia(rs[0]) : rs.slice(0, -1).map(dia).join(', el ') + ' y el ' + dia(rs[rs.length - 1]);
+    const fuertes = rows.filter((r) => r.nivel >= 2), posibles = rows.filter((r) => r.nivel === 1);
+    const pre = '<b>Con el dique cerrado</b>, la lluvia es lo que más sube el Río Negro';
+    if (!rows.length) return pre + '.';
+    if (fuertes.length) return pre + `: ${fuertes.length === 1 ? 'el día marcado abajo es el' : 'los días marcados abajo son los'} de más riesgo (${lista(fuertes)}).`;
+    if (posibles.length) return pre + `. Por ahora no se esperan tormentas fuertes, solo lluvia posible el ${lista(posibles)}.`;
+    return pre + '. Por ahora no se espera lluvia en los próximos días.';
+  }
   // ================= tarjeta: qué pasa a esta altura + lluvia =================
   // solo de hoy en adelante (hora de Argentina): si una actualización se atrasa, no se muestran días que ya pasaron
   function rainRows() {
     const ll = dash.data('lluvia'); if (ll.status !== 'ok') return [];
     const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
     const fut = ll.data.filter((r) => String(r.fecha).slice(0, 10) >= hoy);
-    return (fut.length ? fut : ll.data).slice(0, 4);
+    return fut.slice(0, 4);
   }
   // lluvia: con las compuertas abiertas queda atenuada; cuando se cierran pasa a primer plano
   function drawRain(open) {
     const rain = document.getElementById('lluvia'), rdays = document.getElementById('rain-days');
     const rows = rainRows().map((r) => ({ ...r, nivel: Number(r.nivel) }));
-    if (rdays.dataset.n !== String(rows.length)) {
-      rdays.dataset.n = String(rows.length);
+    const rkey = JSON.stringify(rows.map((r) => [r.fecha, r.nivel, r.descripcion, r.mm, r.mm_modelo, r.prob_modelo]));
+    if (rdays.dataset.k !== rkey) {
+      rdays.dataset.k = rkey;
       rdays.replaceChildren();
+      if (!rows.length) { const v = document.createElement('p'); v.className = 'rp-note'; v.textContent = 'Todavía no hay pronóstico de lluvia para los próximos días.'; rdays.appendChild(v); }
       rows.forEach((r) => {
         const c = document.createElement('div'); c.className = 'rp-rday n' + r.nivel;
         const dd = document.createElement('div'); dd.className = 'dd'; dd.textContent = window.rpDate.utcFormat('%a %-d')(window.rpParse(r.fecha));
@@ -1172,7 +1194,7 @@ window.rpState = { range: 15, idx: null };
     if (sobreEv >= 0) {
       aLbl.textContent = `Pasó el nivel de evacuación (${F2(EV)} m)`;
       aVal.textContent = `+${F2(sobreEv)}`;
-      aSig.textContent = `Le faltan ${F2(TOPE - s.altura_m)} m para el tope del dique (${F2(TOPE)} m)`;
+      aSig.textContent = s.altura_m >= TOPE ? `Superó el tope del dique (${F2(TOPE)} m) por ${F2(s.altura_m - TOPE)} m` : `Le faltan ${F2(TOPE - s.altura_m)} m para el tope del dique (${F2(TOPE)} m)`;
     } else if (sobre >= 0) {
       aLbl.textContent = `Pasó el nivel de alerta (${F2(AL)} m)`;
       aVal.textContent = `+${F2(sobre)}`;
@@ -1188,10 +1210,11 @@ window.rpState = { range: 15, idx: null };
     const fmtH = (hhmm) => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(hhmm || '')); return m ? `${Number(m[1])}${m[2] === '00' ? '' : ':' + m[2]} h` : ''; };
     // contra qué lectura se compara: la última del día anterior, con su hora (el dato cambia cada hora)
     const fa = String(s.fecha_ant || '').slice(0, 10), fl = String(s.fecha).slice(0, 10);
-    const esAyer = fa && new Date(Date.parse(fl + 'T12:00:00Z') - 864e5).toISOString().slice(0, 10) === fa;
-    const cuando = !fa ? 'desde ayer' : esAyer ? 'desde ayer' : `desde el ${window.rpDate.utcFormat('%A %-d')(window.rpParse(fa))}`;
-    const hAnt = fmtH(s.hora_ant);
-    dDia.textContent = `${s.cambio_dia_cm >= 0 ? '▲' : '▼'} ${window.rpFmtCm(s.cambio_dia_cm)} cm ${cuando}${hAnt ? ' a las ' + hAnt : ''}`;
+    const hoyRef = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
+    const ayerRef = new Date(Date.parse(hoyRef + 'T12:00:00Z') - 864e5).toISOString().slice(0, 10);
+    const cuando = !fa ? '' : fa === ayerRef ? 'desde ayer' : fa === hoyRef ? 'desde hoy' : `desde el ${window.rpDate.utcFormat('%A %-d')(window.rpParse(fa))}`;
+    const hAnt = fmtH(s.hora_ant), cuandoH = cuando ? ` ${cuando}${hAnt ? ' a las ' + hAnt : ''}` : '';
+    dDia.textContent = s.cambio_dia_cm === 0 ? `= Sin cambios${cuandoH}` : `${s.cambio_dia_cm > 0 ? '▲' : '▼'} ${window.rpFmtCm(s.cambio_dia_cm)} cm${cuandoH}`;
     dDia.className = 'rp-delta ' + (s.cambio_dia_cm > 0 ? 'rp-up' : s.cambio_dia_cm < 0 ? 'rp-down' : '');
     // de qué día es la medición (puede no ser de hoy si la fuente todavía no publicó el dato del día)
     const med = document.getElementById('medido');
@@ -1224,7 +1247,8 @@ window.rpState = { range: 15, idx: null };
     }
     ritmo.textContent = s.ritmo_cm_dia > 0
       ? `Viene subiendo ~${s.ritmo_cm_dia} cm por día (últimos 7 días)`
-      : `En los últimos 7 días no subió (${window.rpFmtCm(s.ritmo_cm_dia)} cm/día)`;
+      : s.ritmo_cm_dia < 0 ? `Viene bajando ~${Math.abs(s.ritmo_cm_dia)} cm por día (últimos 7 días)`
+      : 'En los últimos 7 días se mantuvo estable';
 
     if (take) {
     take.replaceChildren();
@@ -1314,7 +1338,7 @@ window.rpState = { range: 15, idx: null };
       // si la APA no lo anunció, el estado sale de su manual de operación (cierre con el Paraná en 6 m)
       const gtxt = String(st.data[0].compuertas_rio_negro || '');
       const base = String(st.data[0].compuertas_base || '') === 'manual'
-        ? (/cerrad/i.test(gtxt) ? 'Por protocolo de la APA, con el Paraná sobre 6 m. La APA todavía no lo anunció. ' : 'Por protocolo de la APA, con el Paraná debajo de 6 m. La APA todavía no lo anunció. ')
+        ? (/cerrad/i.test(gtxt) ? 'Con el Paraná sobre 6 m, el protocolo de la APA indica cerrarlas. La APA todavía no lo anunció. ' : 'Con el Paraná debajo de 6 m, el protocolo de la APA indica tenerlas abiertas. La APA todavía no lo anunció. ')
         : 'Informado por la APA. ';
       gr.textContent = base + (!rv ? '' : rv === hoyG ? `Revisado hoy, ${window.rpShort(window.rpParse(rv))}.` : `Revisado por última vez el ${window.rpShort(window.rpParse(rv))}. Hoy todavía no se revisó.`);
       gr.classList.toggle('old', !!rv && rv !== hoyG);
@@ -1326,7 +1350,8 @@ window.rpState = { range: 15, idx: null };
     const manual = String(st.data[0].compuertas_base || '') === 'manual';
     const gs = gt.querySelector('[data-field="compuertas_rio_negro"]');
     if (gs && manual && /abiert|cerrad/i.test(g)) {
-      gs.replaceChildren(Object.assign(document.createElement('small'), { className: 'gate-pre', textContent: 'Deberían estar' }), document.createTextNode(/abiert/i.test(g) ? 'abiertas' : 'cerradas'));
+      // mismo formato que las otras tarjetas: el dato grande y al lado, chico, de dónde sale
+      gs.replaceChildren(document.createTextNode(/abiert/i.test(g) ? 'Abiertas' : 'Cerradas'), ' ', Object.assign(document.createElement('small'), { textContent: 'según protocolo' }));
     }
     const f = document.querySelector('.rp-foot [data-field="fecha"]');
     if (f) f.textContent = String(st.data[0].fecha).slice(0, 10);
@@ -1354,11 +1379,14 @@ window.rpState = { range: 15, idx: null };
     const s = dash.data('satelite');
     const box = document.getElementById('sat');
     if (s.status !== 'ok') return;
-    const a = s.data.find((r) => r.tipo === 'antes'), b = s.data.find((r) => r.tipo === 'reciente');
+    let a = s.data.find((r) => r.tipo === 'antes'), b = s.data.find((r) => r.tipo === 'reciente');
+    if (a && b && String(a.fecha) > String(b.fecha)) [a, b] = [b, a];
     if (a && okImg(a.img) && document.getElementById('sat-antes').src !== a.img) document.getElementById('sat-antes').src = a.img;
     if (b && okImg(b.img) && top.src !== b.img) top.src = b.img;
     document.getElementById('sat-lab-a').textContent = a ? lab(a, 'Anterior') : '';
-    document.getElementById('sat-lab-b').textContent = b ? lab(b, 'Reciente') : '';
+    const hoyS = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
+    const dias = b ? Math.round((Date.parse(hoyS) - Date.parse(String(b.fecha).slice(0, 10))) / 864e5) : 0;
+    document.getElementById('sat-lab-b').textContent = b ? lab(b, dias > 7 ? 'Última' : 'Reciente') + (dias > 7 ? ` · hace ${dias} días` : '') : '';
     setPos();
   });
 
@@ -1395,7 +1423,7 @@ window.rpState = { range: 15, idx: null };
     });
     const p83 = h.data.find((d) => String(d.evento) === '1983');
     const def = h.data.find((d) => d.tipo === 'defensa');
-    txt.textContent = (p83 ? `Hoy el río está ${F2(Number(p83.altura_m) - hoy)} m por debajo del pico de 1983. ` : '') + (def ? `Las defensas actuales están pensadas para aguantar hasta ${F2(Number(def.altura_m))} m, casi un metro más que en 1983.` : '');
+    txt.textContent = (p83 ? (hoy < Number(p83.altura_m) ? `Hoy el río está ${F2(Number(p83.altura_m) - hoy)} m por debajo del pico de 1983. ` : hoy > Number(p83.altura_m) ? `Hoy el río está ${F2(hoy - Number(p83.altura_m))} m por encima del pico de 1983. ` : 'Hoy el río está a la misma altura que el pico de 1983. ') : '') + (def ? `Las defensas actuales están pensadas para aguantar hasta ${F2(Number(def.altura_m))} m, casi un metro más que en 1983.` : '');
 
     // Escenas: 1982-83 vs hoy
     const scene = (el, hv, broken) => {
