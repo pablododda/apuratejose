@@ -17,6 +17,8 @@
 .rp-alertcard { border-top: 3px solid var(--color-warn); }
 .rp-alertcard .rp-label { color: var(--color-warn); font-weight: 600; }
 .rp-alertcard.evac { border-top-color: var(--color-bad); }
+.rp-gaterev { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 2px 0 0; }
+.rp-gaterev.old { color: var(--color-warn); }
 .rp-alertcard.evac .rp-label { color: var(--color-bad); }
 .rp-gate.open { color: var(--color-ok); }
 .rp-gate.closed { color: var(--color-warn); }
@@ -171,7 +173,7 @@
   .rp-tiles > .rp-card { background: transparent; border: 0; border-radius: 0; padding: 12px 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: center; }
   .rp-tiles > .rp-card + .rp-card { border-top: 1px solid var(--color-border-line); }
   .rp-tiles .rp-label { grid-column: 1; }
-  .rp-tiles .rp-delta, .rp-tiles .rp-src, .rp-tiles .rp-medido { grid-column: 1; margin-top: 2px; }
+  .rp-tiles .rp-delta, .rp-tiles .rp-src, .rp-tiles .rp-medido, .rp-tiles .rp-gaterev { grid-column: 1; margin-top: 2px; }
   .rp-tiles .rp-big { grid-column: 2; grid-row: 1 / span 3; margin: 0; font-size: 28px; text-align: right; white-space: nowrap; }
   .rp-tiles .rp-big small { font-size: 13px; }
   .rp-tiles .rp-alertcard { border-top-width: 0; }
@@ -335,6 +337,7 @@
     <div class="rp-card">
       <div class="rp-label">Río Negro: compuertas del dique</div>
       <div class="rp-big rp-gate" id="gate-tile"><span class="dash-skeleton" data-source="situacion" data-field="compuertas_rio_negro" data-row="0">—</span></div>
+      <p class="rp-gaterev" id="gate-rev"></p>
       <p class="rp-src"><span class="src-apa-pre">Último informe de la APA</span>: <a class="src-apa" href="https://www.diariolavozdelchaco.com/2026/10/14/moran-advirtio-que-el-parana-llegara-a-los-6-metros-y-permanecera-alto/" target="_blank" rel="noopener">14 oct (La Voz del Chaco)</a></p>
     </div>
   </section>
@@ -1300,6 +1303,14 @@ window.rpState = { range: 15, idx: null };
     if (cr) cr.textContent = /cerrad/i.test(cg) ? 'Hoy las compuertas están cerradas: por eso importa que el Río Negro no quede mucho más bajo que el Paraná.'
       : /abiert/i.test(cg) ? 'Con las compuertas abiertas, como hoy, los dos lados están al mismo nivel y no hay ese empuje.'
       : 'Con el Paraná sobre 6 m, el manual de la APA indica cerrar las compuertas: desde ese momento importa que el Río Negro no quede mucho más bajo que el Paraná.';
+    // las compuertas se revisan todos los días: se muestra el día de la última revisión (no solo la fecha del informe de la APA)
+    const gr = document.getElementById('gate-rev');
+    if (gr) {
+      const hoyG = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
+      const rv = String(st.data[0].compuertas_revisado || '').slice(0, 10);
+      gr.textContent = !rv ? '' : rv === hoyG ? `Revisado hoy, ${window.rpShort(window.rpParse(rv))}` : `Revisado por última vez el ${window.rpShort(window.rpParse(rv))}. Hoy todavía no se revisó.`;
+      gr.classList.toggle('old', !!rv && rv !== hoyG);
+    }
     const gt = document.getElementById('gate-tile');
     const g = String(st.data[0].compuertas_rio_negro || '');
     gt.className = 'rp-big rp-gate ' + (/abiert/i.test(g) ? 'open' : /cerrad/i.test(g) ? 'closed' : '');

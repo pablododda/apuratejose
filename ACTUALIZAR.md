@@ -15,7 +15,7 @@ Además de esta rutina, un robot de GitHub Actions (`.github/workflows/altura_ho
 
 Mirá la hora actual en Argentina (`TZ=America/Argentina/Buenos_Aires date`).
 - Corrida de la mañana (antes de las 12): ACTUALIZACIÓN COMPLETA (pasos 1 a 7).
-- Corrida de la noche (20 h): ACTUALIZACIÓN LIVIANA (pasos 1, 7 y, si encontrás algo nuevo de la APA sobre compuertas en una búsqueda rápida, el paso 3).
+- Corrida de la noche (20 h): ACTUALIZACIÓN LIVIANA (pasos 1, 3 solo para compuertas y alerta, y 7).
 
 Si una fuente no responde, dejá ese archivo como está y seguí con el resto.
 
@@ -42,7 +42,8 @@ Cómo elegir:
 Fuentes: INA (https://www.ina.gov.ar/alerta/, reporte diario https://alerta.ina.gob.ar/a5/diario/reporte_diario, informe semanal) y comunicados de la APA Chaco en la prensa (buscá "APA Paraná Barranqueras pronóstico" de los últimos días). Solo números atribuidos a INA o APA. Si no hay número oficial nuevo, mantené el vigente y quitá fechas que ya pasaron.
 
 ### 3. situacion.json
-Una fila: `{fecha, actualizado, alerta_apa, compuertas_rio_negro, tendencia, corrientes_m, corrientes_fecha, resumen, pronostico_texto, fuentes, fuente_url, pronostico_url?}`.
+Una fila: `{fecha, actualizado, alerta_apa, compuertas_rio_negro, tendencia, corrientes_m, corrientes_fecha, resumen, pronostico_texto, fuentes, fuente_url, pronostico_url?, compuertas_revisado}`.
+- COMPUERTAS, EN TODAS LAS CORRIDAS (también la liviana de la noche): buscá en las noticias de HOY y de ayer qué dijo la APA o el gobierno del Chaco sobre las compuertas del dique del Río Negro, actualizá `compuertas_rio_negro` si hay algo nuevo, y poné SIEMPRE `compuertas_revisado` = fecha de hoy (YYYY-MM-DD) aunque no haya novedades. La página muestra "Revisado hoy" o avisa en naranja si hoy no se revisó. Si la APA habla de las bombas funcionando o del cierre pero sin decirlo claro, no pongas "Cerradas": dejá "Sin confirmar" y contalo en `resumen`.
 - Buscá SIEMPRE las noticias del día sobre la APA y el Paraná ("APA Morán Paraná", "APA compuertas río Negro", "Comité de Emergencia Chaco Paraná"), en La Voz del Chaco, Diario Norte, Data Chaco, Chaco Día por Día y chaco.gob.ar. Si hay un informe de la APA más nuevo que el de `fuente_url`, actualizá compuertas, alerta, pronóstico y `fuente_url` con ese informe.
 - `compuertas_rio_negro`: "Abiertas" o "Cerradas" SOLO si la APA (o el gobierno del Chaco) lo informó en los últimos días (buscá "APA compuertas río Negro" en la prensa y en chaco.gov.ar). Si el Paraná superó 6 m en Barranqueras y no hay confirmación de la APA, poné "Sin confirmar".
 - `fuente_url`: URL https de la nota o comunicado MÁS RECIENTE de la APA (si no hay nueva, dejá la anterior). La página muestra "Último informe de la APA: <fecha de la URL>"; si la URL no tiene la fecha en la ruta, poné `fuente_fecha` (YYYY-MM-DD) y `fuente_medio`.
