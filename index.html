@@ -11,6 +11,11 @@
 <meta property="og:description" content="Altura del Paraná, compuertas del Río Negro y pronóstico de lluvia, con datos oficiales. La altura se actualiza cada hora.">
 <meta property="og:url" content="https://apuratejose.com.ar">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://apuratejose.com.ar/fuente/data/og.png?v=202610191200">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Altura del Paraná en Barranqueras y estado de las compuertas del Río Negro">
+<meta name="twitter:card" content="summary_large_image">
 
 <title>Crecida del Paraná y cómo afecta al Río Negro</title>
 <style>
@@ -408,11 +413,38 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
   .rp-ladder li { grid-template-columns: 3.6rem 1fr; }
   .rp-ladder .s { grid-column: 2; text-align: left; }
 }
+/* compartir: botón arriba a la derecha; en celular abre el menú del teléfono, en compu un menú propio */
+.rp-head { position: relative; }
+.rp-head h1 { padding-right: 150px; }
+.rp-share { position: absolute; top: 2px; right: 0; display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; font: 600 14px var(--font-anthropic-sans); color: var(--color-fg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: 999px; cursor: pointer; }
+.rp-share:hover { background: var(--color-bg); }
+.rp-share:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.rp-sharemenu { position: absolute; top: 52px; right: 0; width: 300px; max-width: calc(100vw - 32px); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.14); padding: 8px; z-index: 20; font: 15px var(--font-anthropic-sans); }
+.rp-sharemenu[hidden], .rp-sharetoast[hidden] { display: none; }
+.rp-sharemenu a, .rp-sharemenu button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 12px; border: 0; border-radius: 9px; background: none; color: var(--color-fg); font: inherit; text-decoration: none; cursor: pointer; text-align: left; }
+.rp-sharemenu a:hover, .rp-sharemenu button:hover, .rp-sharemenu a:focus-visible, .rp-sharemenu button:focus-visible { background: var(--color-bg); outline: none; }
+.rp-sharemenu .ic { width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; color: #fff; font: 700 14px system-ui, sans-serif; }
+.rp-sharemenu .tx { margin: 6px 4px 2px; padding: 10px 12px 4px; border-top: 1px solid var(--color-border-line); color: var(--color-fg-muted); font-size: 13px; line-height: 1.45; }
+.rp-sharetoast { position: absolute; top: 56px; right: 0; z-index: 21; background: var(--color-fg); color: var(--color-panel); padding: 10px 16px; border-radius: 999px; font: 600 14px var(--font-anthropic-sans); }
+@media (max-width: 600px) {
+  .rp-head h1 { padding-right: 52px; }
+  .rp-share { width: 42px; height: 42px; padding: 0; justify-content: center; }
+  .rp-share span { display: none; }
+}
 </style>
 
 <div class="rp">
   <header class="rp-head" id="inicio">
     <h1>Crecida del Paraná y cómo afecta al Río Negro</h1>
+    <button type="button" class="rp-share" id="share" aria-haspopup="menu" aria-expanded="false" aria-controls="share-menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7.5 7.5 12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span>Compartir</span></button>
+    <div class="rp-sharemenu" id="share-menu" role="menu" hidden>
+      <button type="button" role="menuitem" id="share-copy"><span class="ic" style="background:#6b6860">⧉</span>Copiar link</button>
+      <a role="menuitem" id="share-wa" target="_blank" rel="noopener"><span class="ic" style="background:#25D366">W</span>WhatsApp</a>
+      <a role="menuitem" id="share-x" target="_blank" rel="noopener"><span class="ic" style="background:#111">X</span>X</a>
+      <a role="menuitem" id="share-fb" target="_blank" rel="noopener"><span class="ic" style="background:#1877F2">f</span>Facebook</a>
+      <p class="tx" id="share-tx"></p>
+    </div>
+    <div class="rp-sharetoast" id="share-toast" role="status" hidden>✓ Link copiado</div>
     <div class="rp-fresh" id="fresh" data-source="situacion"><span class="rp-fresh-dot"></span><span>Revisado: <b id="fresh-txt">—</b></span></div>
     <p class="rp-freshnote">La altura del río se actualiza sola cada hora. El pronóstico, las compuertas y la lluvia se revisan a las 10 y a las 20.</p>
   </header>
@@ -1775,7 +1807,55 @@ window.rpState = { range: 15, idx: null };
 
 <!-- Medición de visitas: Cloudflare Web Analytics y Microsoft Clarity -->
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "03fb9fda78224ad78a769bdea79804a2"}'></script>
-<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","yx6ja2m1y4");</script>
+<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","yx6ja2m1y4");
+// ================= compartir =================
+// El texto sale de los mismos datos que muestra la página, así nunca dice algo distinto
+(() => {
+  const URL_SITIO = 'https://apuratejose.com.ar';
+  const btn = document.getElementById('share'), menu = document.getElementById('share-menu'), toast = document.getElementById('share-toast');
+  if (!btn) return;
+  function texto() {
+    const r = dash.data('resumen'), st = dash.data('situacion');
+    if (r.status !== 'ok' || !r.data[0]) return 'Altura del Paraná en Barranqueras, compuertas del Río Negro y lluvia, con datos oficiales.';
+    const s = r.data[0], h = Number(s.altura_m), AL = Number(s.alerta_m) || 6, EV = Number(s.evacuacion_m) || 6.5;
+    const nivel = h >= 9.5 ? 'sobre el tope del dique' : h >= EV ? 'sobre el nivel de evacuación' : h >= AL ? 'sobre el nivel de alerta' : `a ${window.rpFmt2(AL - h)} m del nivel de alerta`;
+    let t = `El Paraná está en ${window.rpFmt2(h)} m en Barranqueras, ${nivel}.`;
+    const c = st.status === 'ok' && st.data[0] ? String(st.data[0].compuertas_rio_negro || '') : '';
+    const est = /cerrad/i.test(c) ? 'cerradas' : /abiert/i.test(c) ? 'abiertas' : '';
+    if (est) t += String(st.data[0].compuertas_base || '') === 'manual'
+      ? ` Las compuertas del Río Negro están ${est} según el protocolo de la APA.`
+      : ` Las compuertas del Río Negro están ${est}, según informó la APA.`;
+    return t + ' Seguilo acá:';
+  }
+  const cerrar = () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+  function copiado() { cerrar(); toast.hidden = false; clearTimeout(copiado.t); copiado.t = setTimeout(() => { toast.hidden = true; }, 2200); }
+  async function copiar() {
+    try { await navigator.clipboard.writeText(URL_SITIO); copiado(); return; } catch (_) {}
+    const ta = document.createElement('textarea'); ta.value = URL_SITIO; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (_) {} ta.remove(); copiado();
+  }
+  btn.addEventListener('click', async () => {
+    const t = texto();
+    // en celular: el menú del teléfono (WhatsApp, Instagram, mensajes, etc.)
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+      try { await navigator.share({ title: document.title, text: t, url: URL_SITIO }); } catch (_) {}
+      return;
+    }
+    if (!menu.hidden) { cerrar(); return; }
+    const full = t + ' ' + URL_SITIO;
+    document.getElementById('share-tx').textContent = `Se comparte: “${full}”`;
+    document.getElementById('share-wa').href = 'https://wa.me/?text=' + encodeURIComponent(full);
+    document.getElementById('share-x').href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(t) + '&url=' + encodeURIComponent(URL_SITIO);
+    document.getElementById('share-fb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(URL_SITIO);
+    toast.hidden = true; menu.hidden = false; btn.setAttribute('aria-expanded', 'true');
+    document.getElementById('share-copy').focus();
+  });
+  document.getElementById('share-copy').addEventListener('click', copiar);
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setTimeout(cerrar, 0)));
+  document.addEventListener('click', (e) => { if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) cerrar(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) { cerrar(); btn.focus(); } });
+})();
+</script>
 
 </div>
 
