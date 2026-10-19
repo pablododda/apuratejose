@@ -43,9 +43,9 @@ Fuentes: INA (https://www.ina.gov.ar/alerta/, reporte diario https://alerta.ina.
 
 ### 3. situacion.json
 Una fila: `{fecha, actualizado, alerta_apa, compuertas_rio_negro, tendencia, corrientes_m, corrientes_fecha, resumen, pronostico_texto, fuentes, fuente_url, pronostico_url?, compuertas_revisado}`.
-- COMPUERTAS, EN TODAS LAS CORRIDAS (también la liviana de la noche): buscá en las noticias de HOY y de ayer qué dijo la APA o el gobierno del Chaco sobre las compuertas del dique del Río Negro, actualizá `compuertas_rio_negro` si hay algo nuevo, y poné SIEMPRE `compuertas_revisado` = fecha de hoy (YYYY-MM-DD) aunque no haya novedades. La página muestra "Revisado hoy" o avisa en naranja si hoy no se revisó. Si la APA habla de las bombas funcionando o del cierre pero sin decirlo claro, no pongas "Cerradas": dejá "Sin confirmar" y contalo en `resumen`.
+- COMPUERTAS, EN TODAS LAS CORRIDAS (también la liviana de la noche): buscá en las noticias de HOY y de ayer qué dijo la APA o el gobierno del Chaco sobre las compuertas del dique del Río Negro, actualizá `compuertas_rio_negro` si hay algo nuevo, y poné SIEMPRE `compuertas_revisado` = fecha de hoy (YYYY-MM-DD) aunque no haya novedades. La página muestra "Revisado hoy" o avisa en naranja si hoy no se revisó. Si la APA habla de las bombas funcionando o del cierre pero sin decirlo claro, no pongas "Cerradas": no cambies el estado (queda el del manual) y contalo en `resumen`.
 - Buscá SIEMPRE las noticias del día sobre la APA y el Paraná ("APA Morán Paraná", "APA compuertas río Negro", "Comité de Emergencia Chaco Paraná"), en La Voz del Chaco, Diario Norte, Data Chaco, Chaco Día por Día y chaco.gob.ar. Si hay un informe de la APA más nuevo que el de `fuente_url`, actualizá compuertas, alerta, pronóstico y `fuente_url` con ese informe.
-- `compuertas_rio_negro`: "Abiertas" o "Cerradas" SOLO si la APA (o el gobierno del Chaco) lo informó en los últimos días (buscá "APA compuertas río Negro" en la prensa y en chaco.gov.ar). Si el Paraná superó 6 m en Barranqueras y no hay confirmación de la APA, poné "Sin confirmar".
+- `compuertas_rio_negro`: siempre "Abiertas" o "Cerradas". Si la APA (o el gobierno del Chaco) lo anunció EXPLÍCITAMENTE, poné ese estado, `compuertas_base` = "APA" y `compuertas_fecha_apa` = fecha del anuncio (YYYY-MM-DD). Si no hay anuncio explícito, no lo toques: el robot de cada hora aplica el manual de la APA (6 m o más: "Cerradas"; menos de 6 m: "Abiertas") y pone `compuertas_base` = "manual". Nunca pongas "Sin confirmar".
 - `fuente_url`: URL https de la nota o comunicado MÁS RECIENTE de la APA (si no hay nueva, dejá la anterior). La página muestra "Último informe de la APA: <fecha de la URL>"; si la URL no tiene la fecha en la ruta, poné `fuente_fecha` (YYYY-MM-DD) y `fuente_medio`.
 - `pronostico_url`: URL de donde sale el pronóstico de `pronostico_texto` si NO es la misma nota de `fuente_url` (por ejemplo, el reporte del INA). Si es la misma, no lo pongas.
 - `corrientes_m` y `corrientes_fecha`: los actualiza solo el robot de cada hora (INA). No los toques.
@@ -60,17 +60,14 @@ No cambian, salvo que la APA, el INA o la UNNE publiquen niveles nuevos.
 - nivel, lluvia, descripcion: SMN (oficial): https://ws.smn.gob.ar/map_items/forecast/0, /1, /2 y /3 (0 = hoy), entrada "Resistencia" (Chaco). Usá mañana y tarde para el nivel; descripción corta en español (máximo ~8 palabras). Si hay alerta del SMN por tormentas o lluvias para Resistencia o el departamento San Fernando, mencionala y, si el SMN da milímetros acumulados, ponelos en "mm" como texto (ej. "30 a 50 mm"); si no, omití "mm".
 - mm_modelo (número, mm del día; 0 si no muestra lluvia) y prob_modelo (0 a 100, o null): Meteored, https://www.meteored.com.ar/tiempo-en_Resistencia-America+Sur-Argentina-Chaco-SARE-1-16890.html (estimación no oficial). Si no responde, dejá los valores anteriores para las fechas que coincidan.
 
-### 6. satelite.json (solo en la corrida de la mañana)
-`pip install pillow` si falta, y desde la raíz del repo:
-`python3 -I fuente/sat_update.py fuente/data/satelite.json fuente/data/parana_barranqueras.json fuente/data/satelite.json 30`
-Si no hay acceso a gibs.earthdata.nasa.gov, dejalo como está.
+### 6. satelite.json
+No lo toques: la imagen satelital la actualiza sola el robot de cada hora (Sentinel-2).
 
 ### 6b. Control de coherencia (SIEMPRE, antes de publicar)
 La página tiene que coincidir con sus fuentes. Si algo de esto falla, corregilo antes de publicar:
 - Cada número de la página tiene una fuente con un link que lleva a ese mismo número: altura (fila `fuente` de parana_barranqueras.json), compuertas y pronóstico (`fuente_url` / `pronostico_url`), Corrientes (INA), lluvia (SMN y Meteored).
 - `pronostico.json`: ninguna fila "pronostico" con fecha pasada; la primera fila es la última medición.
 - `lluvia.json`: empieza HOY y sigue 2 o 3 días. Nada de días pasados.
-- Si el Paraná está en 6 m o más y la última información de la APA dice "Abiertas" de un día anterior a que pasara los 6 m, poné "Sin confirmar".
 - `pronostico_texto` no contradice la altura actual (ej. no decir "podría llegar a 5,50 m" si ya está en 5,53).
 - Ningún texto dice "hoy" con un dato de otro día.
 

@@ -120,25 +120,38 @@ def main():
             cambio = True
             if not msg.startswith("Paraná"):
                 msg = f"Corrientes {corr[1]:.2f} m".replace(".", ",", 1)
-        # regla del manual de la APA: con el Paraná en 6 m o más se cierran las compuertas. Si el último informe
-        # de la APA dice "Abiertas" pero es de antes de que el río pasara los 6 m, ese dato ya no vale: "Sin confirmar".
+        # compuertas: lo que anuncia la APA manda. Si la APA no dijo nada desde que el Paraná cruzó los 6 m
+        # (para arriba o para abajo), se aplica su manual de operación: 6 m o más, cerradas; menos de 6 m, abiertas.
         try:
             cierre = 6.0
-            alto = [r for r in p if float(r["altura_m"]) >= cierre]
-            if alto and float(p[-1]["altura_m"]) >= cierre and re.search(r"abiert", str(st[0].get("compuertas_rio_negro", "")), re.I):
-                desde = p[-1]["fecha"]
-                for r in reversed(p):
-                    if float(r["altura_m"]) >= cierre: desde = r["fecha"]
-                    else: break
-                m = re.search(r"/(20\d\d)/(\d\d)/(\d\d)/", str(st[0].get("fuente_url", "")))
-                inf = st[0].get("fuente_fecha") or (f"{m.group(1)}-{m.group(2)}-{m.group(3)}" if m else "")
-                if not inf or inf < desde:
-                    st[0]["compuertas_rio_negro"] = "Sin confirmar"
-                    st[0]["resumen"] = "El Paraná pasó los 6 m: según el manual de la APA, a esa altura se cierran las compuertas. La APA todavía no informó el cierre."
+            arriba = float(p[-1]["altura_m"]) >= cierre
+            desde = p[-1]["fecha"]
+            for r in reversed(p):
+                if (float(r["altura_m"]) >= cierre) == arriba: desde = r["fecha"]
+                else: break
+            m = re.search(r"/(20\d\d)/(\d\d)/(\d\d)/", str(st[0].get("fuente_url", "")))
+            inf = st[0].get("compuertas_fecha_apa") or st[0].get("fuente_fecha") or (f"{m.group(1)}-{m.group(2)}-{m.group(3)}" if m else "")
+            base_apa = st[0].get("compuertas_base", "APA") == "APA" and re.search(r"abiert|cerrad", str(st[0].get("compuertas_rio_negro", "")), re.I)
+            if not (base_apa and inf and inf >= desde):
+                estado = "Cerradas" if arriba else "Abiertas"
+                if st[0].get("compuertas_rio_negro") != estado or st[0].get("compuertas_base") != "manual":
+                    st[0]["compuertas_rio_negro"] = estado
+                    st[0]["compuertas_base"] = "manual"
+                    st[0]["resumen"] = ("El Paraná está sobre 6 m: según el manual de la APA, las compuertas se cierran y el agua del Río Negro sale por bombeo."
+                                        if arriba else "El Paraná está debajo de 6 m: según el manual de la APA, las compuertas están abiertas.")
                     cambio = True
-                    msg = (msg + "; " if msg.startswith("Paraná") else "") + "compuertas sin confirmar (Paraná sobre 6 m)"
+                    msg = (msg + "; " if msg.startswith("Paraná") else "") + f"compuertas {estado.lower()} (manual de la APA)"
         except Exception as e:
             print("regla de compuertas: error", e)
+        # imagen satelital (Sentinel-2): busca una pasada nueva con pocas nubes sobre el dique
+        try:
+            import sat_s2
+            r = sat_s2.actualizar(os.path.join(DATA, "satelite.json"), pp)
+            if r:
+                cambio = True
+                msg = (msg + "; " if msg.startswith("Paraná") else "") + r
+        except Exception as e:
+            print("satélite: error", e)
         if cambio:
             # "Revisado" = la última vez que entró un dato nuevo (el robot mira cada 10 minutos)
             st[0]["actualizado"] = ahora.replace(microsecond=0).isoformat()

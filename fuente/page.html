@@ -438,7 +438,7 @@
     <div class="rp-duo">
       <div class="rp-duo-a">
         <h2>Norte de Resistencia desde el satélite</h2>
-        <p class="rp-note">Arrastrá la línea sobre la imagen para comparar antes de la crecida con la imagen más reciente con pocas nubes.</p>
+        <p class="rp-note">Arrastrá la línea sobre la imagen para comparar antes de la crecida con la imagen más reciente en la que se ve el dique.</p>
         <div class="rp-satbox" id="sat" data-source="satelite">
           <img class="rp-satimg" draggable="false" id="sat-antes" alt="Imagen satelital antes de la crecida">
           <img class="rp-satimg rp-sattop" draggable="false" id="sat-ahora" alt="Imagen satelital más reciente">
@@ -450,12 +450,12 @@
           <span class="rp-satpintxt" style="left: 77.4%; top: 66%;">Dique</span>
         </div>
         <input id="sat-range" type="hidden" value="50">
-        <p class="rp-src">Fuente: <a href="https://worldview.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA (satélites Landsat y Sentinel‑2)</a></p>
+        <p class="rp-src">Fuente: <a href="https://browser.dataspace.copernicus.eu/" target="_blank" rel="noopener">Copernicus (Sentinel‑2)</a> y <a href="https://worldview.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA (Landsat)</a></p>
       </div>
       <div class="rp-duo-b">
         <h2>Qué mirar en esta zona</h2>
         <p class="rp-text">El punto rojo marca el <b>dique regulador</b>, donde el Río Negro desemboca en el Paraná (el agua marrón, abajo a la derecha). El <b>Río Negro</b> es la línea verde que serpentea por el norte de la ciudad: con las <b>compuertas cerradas y mucha lluvia</b>, es el que puede subir.</p>
-        <p class="rp-note">El satélite pasa cada 2 o 3 días y solo se muestran los días con pocas nubes, por eso la imagen puede tener algunos días de atraso. Cada punto de la imagen equivale a unos 30 metros.</p>
+        <p class="rp-note">Los satélites pasan por acá cada 2 a 5 días, siempre a media mañana. Si ese día el dique está tapado por nubes, la imagen no sirve y se espera a la pasada siguiente: por eso, en semanas de lluvia, la imagen puede tener varios días de atraso. La de antes queda fija, para comparar. Cada punto de la imagen equivale a entre 10 y 30 metros.</p>
         <div class="rp-links">
           <a href="https://www.google.com/maps/@-27.456517,-58.898833,16z/data=!3m1!1e3" target="_blank" rel="noopener">Ver en Google Maps ↗</a>
         </div>
@@ -1308,7 +1308,9 @@ window.rpState = { range: 15, idx: null };
     if (gr) {
       const hoyG = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
       const rv = String(st.data[0].compuertas_revisado || '').slice(0, 10);
-      gr.textContent = !rv ? '' : rv === hoyG ? `Revisado hoy, ${window.rpShort(window.rpParse(rv))}` : `Revisado por última vez el ${window.rpShort(window.rpParse(rv))}. Hoy todavía no se revisó.`;
+      // si la APA no lo anunció, el estado sale de su manual de operación (cierre con el Paraná en 6 m)
+      const base = String(st.data[0].compuertas_base || '') === 'manual' ? 'Según el manual de la APA (se cierran con el Paraná en 6 m). ' : 'Informado por la APA. ';
+      gr.textContent = base + (!rv ? '' : rv === hoyG ? `Revisado hoy, ${window.rpShort(window.rpParse(rv))}.` : `Revisado por última vez el ${window.rpShort(window.rpParse(rv))}. Hoy todavía no se revisó.`);
       gr.classList.toggle('old', !!rv && rv !== hoyG);
     }
     const gt = document.getElementById('gate-tile');
@@ -1335,7 +1337,7 @@ window.rpState = { range: 15, idx: null };
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => sbox.addEventListener(ev, () => { dragging = false; }));
   rng.addEventListener('input', setPos);
   const okImg = (s) => typeof s === 'string' && /^data:image\/(jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(s);
-  const lab = (r, txt) => `${txt} · ${window.rpDate.utcFormat('%-d %b')(window.rpParse(r.fecha))}${r.altura_m != null ? ' · río a ' + F2(Number(r.altura_m)) + ' m' : ''}`;
+  const lab = (r, txt) => `${txt} · ${window.rpDate.utcFormat('%-d %b')(window.rpParse(r.fecha))}${r.altura_m != null ? ' · río a ' + F2(Number(r.altura_m)) + ' m' : ''}${Number(r.nubes_pct) >= 10 ? ' · con algunas nubes' : ''}`;
   dash.onData(() => {
     const s = dash.data('satelite');
     const box = document.getElementById('sat');
