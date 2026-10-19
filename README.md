@@ -54,7 +54,7 @@ The site is static: no server and no database. The robot runs on GitHub Actions.
 1. **Copy it.** Click **Use this template** (or **Fork**). You get your own copy and your own site. Nothing you do there touches apuratejose.com.ar.
 2. **Remove what is ours:**
    - `CNAME` (our domain). Put yours or delete it.
-   - The analytics snippets in `fuente/page.html` (Cloudflare Web Analytics and Microsoft Clarity). Replace them with your own IDs, or your visits will land in our dashboards.
+   - Analytics: `fuente/page.html` loads Cloudflare Web Analytics and Microsoft Clarity only on our domains, so your copy sends nothing to our accounts. To measure your own site, put your domain and your own IDs in that block (search for `DOMINIOS`).
 3. **Pick a height source** for your river and rewrite the fetch in `fuente/agp_update.py`, which today reads a port gauge and a backup source. Most countries publish gauges in real time. In England, for example, the Environment Agency has a public flood monitoring API. In Spain, each river basin publishes its own SAIH network.
 4. **Set your levels** in `umbrales.json`, then reset `parana_barranqueras.json` with a few days of your river.
 5. **Satellite:** change `BBOX` in `fuente/sat_s2.py` to the area you want to show.
@@ -80,7 +80,7 @@ Code: [MIT](LICENSE). Please keep the credit. The data belongs to the agencies t
 
 **Para usarla en otro río:** tocá **Use this template** (o **Fork**). Te queda una copia propia, con tu propio sitio, y nada de lo que hagas ahí toca apuratejose.com.ar. Después seguí los pasos de arriba ("Using it for another river"). Los más importantes son estos:
 
-- sacar nuestro `CNAME` y nuestros códigos de analítica;
+- sacar nuestro `CNAME` (la analítica solo funciona en nuestros dominios, así que tu copia no nos manda nada; para medir la tuya, poné tu dominio y tus códigos donde dice `DOMINIOS`);
 - cambiar de dónde sale la altura en `fuente/agp_update.py`;
 - poner tus niveles en `umbrales.json`;
 - reescribir los textos que son de Resistencia (dique, compuertas, bombas, 1983).
