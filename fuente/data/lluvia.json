@@ -1,1 +1,1 @@
-[{"fecha": "2026-10-26", "nivel": 0, "lluvia": "Sin lluvia", "descripcion": "Sin lluvia", "mm_modelo": 0, "prob_modelo": 0}, {"fecha": "2026-10-27", "nivel": 1, "lluvia": "Posible", "descripcion": "Lluvia débil posible", "mm_modelo": 0.4, "prob_modelo": 50}]
+[{"fecha": "2026-10-27", "nivel": 1, "lluvia": "Posible", "descripcion": "Lluvia débil posible", "mm_modelo": 0.1, "prob_modelo": 90}]
