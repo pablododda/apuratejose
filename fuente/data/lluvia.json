@@ -1,1 +1,34 @@
-[{"fecha": "2026-10-27", "nivel": 1, "lluvia": "Posible", "descripcion": "Lluvia débil posible", "mm_modelo": 0.1, "prob_modelo": 90}]
+[
+ {
+  "fecha": "2026-10-30",
+  "nivel": 0,
+  "lluvia": "No",
+  "descripcion": "Niebla, sin lluvia",
+  "mm_modelo": 0,
+  "prob_modelo": null
+ },
+ {
+  "fecha": "2026-10-31",
+  "nivel": 0,
+  "lluvia": "No",
+  "descripcion": "Parcialmente nublado",
+  "mm_modelo": 0,
+  "prob_modelo": 0
+ },
+ {
+  "fecha": "2026-11-01",
+  "nivel": 0,
+  "lluvia": "No",
+  "descripcion": "Parcialmente nublado",
+  "mm_modelo": 0,
+  "prob_modelo": null
+ },
+ {
+  "fecha": "2026-11-02",
+  "nivel": 1,
+  "lluvia": "Posible",
+  "descripcion": "Tormentas aisladas posibles",
+  "mm_modelo": 10,
+  "prob_modelo": 60
+ }
+]
