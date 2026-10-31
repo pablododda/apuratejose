@@ -1,13 +1,5 @@
 [
  {
-  "fecha": "2026-10-30",
-  "nivel": 0,
-  "lluvia": "No",
-  "descripcion": "Niebla, sin lluvia",
-  "mm_modelo": 0,
-  "prob_modelo": null
- },
- {
   "fecha": "2026-10-31",
   "nivel": 0,
   "lluvia": "No",
