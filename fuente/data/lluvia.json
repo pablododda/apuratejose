@@ -1,13 +1,5 @@
 [
  {
-  "fecha": "2026-10-31",
-  "nivel": 0,
-  "lluvia": "No",
-  "descripcion": "Parcialmente nublado",
-  "mm_modelo": 0,
-  "prob_modelo": 0
- },
- {
   "fecha": "2026-11-01",
   "nivel": 0,
   "lluvia": "No",
