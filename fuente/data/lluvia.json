@@ -1,13 +1,5 @@
 [
  {
-  "fecha": "2026-11-02",
-  "nivel": 1,
-  "lluvia": "Posible",
-  "descripcion": "Tormentas aisladas posibles",
-  "mm_modelo": 2.5,
-  "prob_modelo": 90
- },
- {
   "fecha": "2026-11-03",
   "nivel": 1,
   "lluvia": "Posible",
