@@ -1,18 +1,26 @@
 [
  {
-  "fecha": "2026-11-03",
-  "nivel": 1,
-  "lluvia": "Posible",
-  "descripcion": "Lluvias posibles",
-  "mm_modelo": 3.2,
-  "prob_modelo": 80
- },
- {
   "fecha": "2026-11-04",
   "nivel": 2,
   "lluvia": "Sí",
   "descripcion": "Lluvias y tormentas probables",
-  "mm_modelo": 23,
+  "mm_modelo": 41,
   "prob_modelo": 90
+ },
+ {
+  "fecha": "2026-11-05",
+  "nivel": 0,
+  "lluvia": "No",
+  "descripcion": "Parcialmente nublado",
+  "mm_modelo": 0,
+  "prob_modelo": null
+ },
+ {
+  "fecha": "2026-11-06",
+  "nivel": 0,
+  "lluvia": "No",
+  "descripcion": "Parcialmente nublado",
+  "mm_modelo": 0,
+  "prob_modelo": null
  }
 ]
