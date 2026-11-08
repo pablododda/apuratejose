@@ -1,34 +1,26 @@
 [
- {
-  "fecha": "2026-11-07",
-  "nivel": 1,
-  "lluvia": "Posible",
-  "descripcion": "Lluvias posibles, parcialmente nublado",
-  "mm_modelo": 0.4,
-  "prob_modelo": 90
- },
- {
-  "fecha": "2026-11-08",
-  "nivel": 0,
-  "lluvia": "No",
-  "descripcion": "Soleado",
-  "mm_modelo": 0,
-  "prob_modelo": null
- },
- {
-  "fecha": "2026-11-09",
-  "nivel": 0,
-  "lluvia": "No",
-  "descripcion": "Soleado",
-  "mm_modelo": 0,
-  "prob_modelo": null
- },
- {
-  "fecha": "2026-11-10",
-  "nivel": 0,
-  "lluvia": "No",
-  "descripcion": "Parcialmente nublado",
-  "mm_modelo": 0,
-  "prob_modelo": null
- }
+  {
+    "fecha": "2026-11-08",
+    "nivel": 0,
+    "lluvia": "No",
+    "descripcion": "Soleado",
+    "mm_modelo": 0,
+    "prob_modelo": null
+  },
+  {
+    "fecha": "2026-11-09",
+    "nivel": 0,
+    "lluvia": "No",
+    "descripcion": "Soleado",
+    "mm_modelo": 0,
+    "prob_modelo": null
+  },
+  {
+    "fecha": "2026-11-10",
+    "nivel": 0,
+    "lluvia": "No",
+    "descripcion": "Parcialmente nublado",
+    "mm_modelo": 0,
+    "prob_modelo": null
+  }
 ]
