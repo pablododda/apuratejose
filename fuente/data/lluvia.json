@@ -1,13 +1,5 @@
 [
   {
-    "fecha": "2026-11-08",
-    "nivel": 0,
-    "lluvia": "No",
-    "descripcion": "Soleado",
-    "mm_modelo": 0,
-    "prob_modelo": null
-  },
-  {
     "fecha": "2026-11-09",
     "nivel": 0,
     "lluvia": "No",
